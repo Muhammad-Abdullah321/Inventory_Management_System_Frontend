@@ -33,6 +33,9 @@ export default function RawMaterialInventory() {
   const [productId, setProductId] = useState("");
   const [finishedGoodId, setFinishedGoodId] = useState("");
   const [transferQuantity, setTransferQuantity] = useState("");
+  const [configureForSelling, setConfigureForSelling] = useState(false);
+  const [sellingSku, setSellingSku] = useState("");
+  const [sellingPrice, setSellingPrice] = useState("");
   const [quantityChange, setQuantityChange] = useState("");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
@@ -126,6 +129,24 @@ export default function RawMaterialInventory() {
       setError("Transfer quantity exceeds available buying stock.");
       return;
     }
+    if (configureForSelling) {
+      if (selectedFinishedGood?.isSellingConfigured) {
+        setError("This product is already configured for selling; its SKU and price will be preserved.");
+        return;
+      }
+      if (!sellingSku.trim()) {
+        setError("Enter a nonblank SKU to configure this product for selling.");
+        return;
+      }
+      if (!/^\d{1,10}(?:\.\d{1,2})?$/.test(sellingPrice.trim())) {
+        setError("Enter a valid nonnegative selling price with at most two decimal places.");
+        return;
+      }
+      if (!selectedFinishedGood?.unit?.trim()) {
+        setError("A valid product unit is required to configure this product for selling.");
+        return;
+      }
+    }
     setSaving(true);
     setError("");
     setSuccess("");
@@ -133,8 +154,15 @@ export default function RawMaterialInventory() {
       await api.post("/inventory/transfers/buying-to-warehouse", {
         productId: finishedGoodId,
         quantity: transferQuantity,
+        configureForSelling,
+        ...(configureForSelling
+          ? { sku: sellingSku.trim(), sellingPrice: sellingPrice.trim() }
+          : {}),
       });
       setTransferQuantity("");
+      setConfigureForSelling(false);
+      setSellingSku("");
+      setSellingPrice("");
       await loadInventory();
       setSuccess("Finished-good stock transferred to selling warehouse.");
     } catch (requestError) {
@@ -199,7 +227,12 @@ export default function RawMaterialInventory() {
           <div className="section-heading"><h2>Transfer finished goods to selling warehouse</h2></div>
           <form className="form-grid" onSubmit={submitTransfer}>
             <Field label="Finished good" required>
-              <select value={finishedGoodId} onChange={(event) => setFinishedGoodId(event.target.value)} required>
+              <select value={finishedGoodId} onChange={(event) => {
+                setFinishedGoodId(event.target.value);
+                setConfigureForSelling(false);
+                setSellingSku("");
+                setSellingPrice("");
+              }} required>
                 <option value="">Select finished good</option>
                 {finishedGoods.map((product) => <option key={product.id} value={product.id}>{product.name}{product.sku ? ` (${product.sku})` : ""}</option>)}
               </select>
@@ -207,6 +240,45 @@ export default function RawMaterialInventory() {
             <Field label="Quantity to transfer" required>
               <input type="number" min="0.000001" step="0.000001" value={transferQuantity} onChange={(event) => setTransferQuantity(event.target.value)} required />
             </Field>
+            {selectedFinishedGood?.isSellingConfigured ? (
+              <p className="form-hint full-width">
+                Already configured for selling as SKU {selectedFinishedGood.sku} at {formatMoney(selectedFinishedGood.sellingPrice)}. This transfer will preserve that configuration.
+              </p>
+            ) : (
+              <>
+                <fieldset className="full-width">
+                  <legend>Selling configuration</legend>
+                  <label>
+                    <input
+                      type="radio"
+                      name="transfer-selling-configuration"
+                      checked={configureForSelling}
+                      onChange={() => setConfigureForSelling(true)}
+                    />
+                    Configure for selling during this transfer
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="transfer-selling-configuration"
+                      checked={!configureForSelling}
+                      onChange={() => setConfigureForSelling(false)}
+                    />
+                    Transfer stock only
+                  </label>
+                </fieldset>
+                {configureForSelling && (
+                  <>
+                    <Field label="Selling SKU" required>
+                      <input value={sellingSku} onChange={(event) => setSellingSku(event.target.value)} required />
+                    </Field>
+                    <Field label="Selling price" required>
+                      <input type="number" min="0" step="0.01" value={sellingPrice} onChange={(event) => setSellingPrice(event.target.value)} required />
+                    </Field>
+                  </>
+                )}
+              </>
+            )}
             <div className="form-actions">
               <button className="button button-primary" disabled={saving || !finishedGoodId}>{saving ? "Submitting..." : "Transfer to selling warehouse"}</button>
               <span className="form-hint">Available buying quantity: {transferableQuantity}. The transfer preserves total tracked quantity.</span>
