@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { Alert, DataTable, Field, formatDate, Loading, PageTitle } from "../components/Common.jsx";
-import { addQuantities, isAtLeastQuantity } from "../utils/quantity.js";
+import { isAtLeastQuantity, sellingInventoryTotal } from "../utils/quantity.js";
 
 const matchedColumns = [
   { key: "shopifyName", label: "Product" },
@@ -260,7 +260,7 @@ export default function Inventory() {
     { key: "sku", label: "SKU" },
     { key: "warehouse", label: "Warehouse / unlisted", render: (row) => row.stock?.find((entry) => entry.bucket === "WAREHOUSE")?.quantity ?? 0 },
     { key: "shopify", label: "Shopify listed", render: (row) => row.stock?.find((entry) => entry.bucket === "SHOPIFY_LISTED")?.quantity ?? 0 },
-    { key: "total", label: "Total tracked", render: (row) => addQuantities(...(row.stock || []).map((entry) => entry.quantity)) },
+    { key: "total", label: "Total tracked", render: (row) => sellingInventoryTotal(row.stock) },
   ];
   const movementColumns = [
     { key: "createdAt", label: "Date", render: (row) => formatDate(row.createdAt) },
