@@ -47,7 +47,12 @@ function emptyMaterial() {
 export default function Manufacturing() {
   const [products, setProducts] = useState([]);
   const [purchaseItems, setPurchaseItems] = useState([]);
-  const [finishedProductId, setFinishedProductId] = useState("");
+  const [finishedProduct, setFinishedProduct] = useState({
+    name: "",
+    sku: "",
+    sellingPrice: "",
+    unit: "",
+  });
   const [outputQuantity, setOutputQuantity] = useState("");
   const [materials, setMaterials] = useState([emptyMaterial()]);
   const [loading, setLoading] = useState(true);
@@ -72,11 +77,6 @@ export default function Manufacturing() {
           vendorName: purchase.vendor?.name || "Vendor",
         }))
       ));
-      setFinishedProductId((current) =>
-        current || productResponse.data.data.find((product) =>
-          product.classification === "FINISHED_GOOD" && product.unit
-        )?.id || ""
-      );
     } catch (requestError) {
       setError(getErrorMessage(requestError));
     } finally {
@@ -86,9 +86,6 @@ export default function Manufacturing() {
 
   useEffect(() => { loadInputs(); }, [loadInputs]);
 
-  const finishedProducts = products.filter((product) =>
-    product.classification === "FINISHED_GOOD" && product.unit
-  );
   const rawMaterials = products.filter((product) =>
     product.classification === "RAW_MATERIAL" && product.unit
   );
@@ -146,8 +143,20 @@ export default function Manufacturing() {
 
   function validateForm() {
     const outputMicros = parseQuantityMicros(outputQuantity);
-    if (!finishedProductId || outputMicros === null) {
-      return "Select a finished good and enter a positive output quantity (up to six decimal places).";
+    if (!finishedProduct.name.trim()) {
+      return "Enter a finished product name.";
+    }
+    if (!finishedProduct.sku.trim()) {
+      return "Enter a non-empty finished product SKU.";
+    }
+    if (!/^\d{1,10}(?:\.\d{1,2})?$/.test(finishedProduct.sellingPrice.trim())) {
+      return "Enter a valid selling price with at most two decimal places.";
+    }
+    if (!finishedProduct.unit.trim()) {
+      return "Enter the finished product unit.";
+    }
+    if (outputMicros === null) {
+      return "Enter a positive output quantity (up to six decimal places).";
     }
     if (!materials.length || materials.some((line) => !line.productId)) {
       return "Select a raw material for every material line.";
@@ -204,7 +213,12 @@ export default function Manufacturing() {
     setSuccess("");
     try {
       const response = await api.post("/manufacturing/runs", {
-        finishedProductId,
+        finishedProduct: {
+          name: finishedProduct.name.trim(),
+          sku: finishedProduct.sku.trim(),
+          sellingPrice: finishedProduct.sellingPrice.trim(),
+          unit: finishedProduct.unit.trim(),
+        },
         outputQuantity,
         materials: materials.map((line) => ({
           productId: line.productId,
@@ -235,7 +249,7 @@ export default function Manufacturing() {
 
   return (
     <>
-      <PageTitle title="Manufacturing" subtitle="Record a completed run using selected raw materials" />
+      <PageTitle title="Manufacturing" subtitle="Create or reuse a finished product by SKU, then record a completed run" />
       <Alert message={error} />
       <Alert kind="success" message={success} />
       {loading ? <Loading label="Loading products and purchase cost sources..." /> : (
@@ -243,13 +257,19 @@ export default function Manufacturing() {
           <div className="section-heading"><h2>Complete manufacturing run</h2></div>
           <form className="form-stack" onSubmit={submitRun}>
             <div className="form-grid">
-              <Field label="Finished product" required>
-                <select value={finishedProductId} onChange={(event) => setFinishedProductId(event.target.value)} required>
-                  <option value="">Select finished good</option>
-                  {finishedProducts.map((product) => <option key={product.id} value={product.id}>{product.name}{product.sku ? ` (${product.sku})` : ""} — {product.unit}</option>)}
-                </select>
+              <Field label="New finished product name" required>
+                <input value={finishedProduct.name} onChange={(event) => setFinishedProduct({ ...finishedProduct, name: event.target.value })} required />
               </Field>
-              <Field label={`Output quantity${productById.get(finishedProductId)?.unit ? ` (${productById.get(finishedProductId).unit})` : ""}`} required>
+              <Field label="SKU" required>
+                <input value={finishedProduct.sku} onChange={(event) => setFinishedProduct({ ...finishedProduct, sku: event.target.value })} required />
+              </Field>
+              <Field label="Selling price" required>
+                <input type="number" min="0" step="0.01" value={finishedProduct.sellingPrice} onChange={(event) => setFinishedProduct({ ...finishedProduct, sellingPrice: event.target.value })} required />
+              </Field>
+              <Field label="Finished product unit" required>
+                <input placeholder="e.g. piece, box" value={finishedProduct.unit} onChange={(event) => setFinishedProduct({ ...finishedProduct, unit: event.target.value })} required />
+              </Field>
+              <Field label={`Production quantity${finishedProduct.unit.trim() ? ` (${finishedProduct.unit.trim()})` : ""}`} required>
                 <input type="number" min="0.000001" step="0.000001" value={outputQuantity} onChange={(event) => setOutputQuantity(event.target.value)} required />
               </Field>
             </div>
@@ -290,9 +310,8 @@ export default function Manufacturing() {
             })}
             <div className="form-actions">
               <button type="button" className="button" disabled={saving} onClick={() => setMaterials((current) => [...current, emptyMaterial()])}>Add material</button>
-              <button className="button button-primary" disabled={saving || loading || !finishedProducts.length || !rawMaterials.length}>{saving ? "Posting run..." : "Complete run"}</button>
+              <button className="button button-primary" disabled={saving || loading || !rawMaterials.length}>{saving ? "Posting run..." : "Complete run"}</button>
             </div>
-            {!finishedProducts.length && <p className="form-hint">A finished good with a configured unit is required.</p>}
             {!rawMaterials.length && <p className="form-hint">A raw material with a configured unit is required.</p>}
           </form>
         </section>
