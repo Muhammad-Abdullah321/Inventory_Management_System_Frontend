@@ -18,3 +18,11 @@ export function addQuantities(...values) {
 export function isAtLeastQuantity(balance, requested) {
   return parseQuantityMicros(balance) >= parseQuantityMicros(requested);
 }
+
+export function sellingInventoryTotal(stock = []) {
+  return addQuantities(
+    ...stock
+      .filter((entry) => entry.bucket === "WAREHOUSE" || entry.bucket === "SHOPIFY_LISTED")
+      .map((entry) => entry.quantity)
+  );
+}
