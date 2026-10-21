@@ -10,6 +10,7 @@ export default function Layout() {
       links: [
         ["Buying products", "/buying-products"],
         ["Purchases & history", "/purchases"],
+        ["Billing records", "/billing"],
         ["Vendors", "/vendors"],
         ["Buying inventory", "/raw-inventory"],
       ],
