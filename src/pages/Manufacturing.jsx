@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { Alert, DataTable, Field, formatMoney, Loading, PageTitle } from "../components/Common.jsx";
+import useUnits from "../hooks/useUnits.js";
 import { isAtLeastQuantity } from "../utils/quantity.js";
 
 const QUANTITY_SCALE = 1_000_000n;
@@ -46,6 +47,7 @@ function emptyMaterial() {
 
 export default function Manufacturing() {
   const [products, setProducts] = useState([]);
+  const { units, loading: unitsLoading, error: unitsError, reload: loadUnits } = useUnits();
   const [purchaseItems, setPurchaseItems] = useState([]);
   const [finishedProduct, setFinishedProduct] = useState({
     name: "",
@@ -252,7 +254,7 @@ export default function Manufacturing() {
       <PageTitle title="Manufacturing" subtitle="Create or reuse a finished product by SKU, then record a completed run" />
       <Alert message={error} />
       <Alert kind="success" message={success} />
-      {loading ? <Loading label="Loading products and purchase cost sources..." /> : (
+      {loading ? <Loading label="Loading products, units, and purchase cost sources..." /> : (
         <section className="panel">
           <div className="section-heading"><h2>Complete manufacturing run</h2></div>
           <form className="form-stack" onSubmit={submitRun}>
@@ -267,7 +269,15 @@ export default function Manufacturing() {
                 <input type="number" min="0" step="0.01" value={finishedProduct.sellingPrice} onChange={(event) => setFinishedProduct({ ...finishedProduct, sellingPrice: event.target.value })} required />
               </Field>
               <Field label="Finished product unit" required>
-                <input placeholder="e.g. piece, box" value={finishedProduct.unit} onChange={(event) => setFinishedProduct({ ...finishedProduct, unit: event.target.value })} required />
+                <select
+                  value={finishedProduct.unit}
+                  onChange={(event) => setFinishedProduct({ ...finishedProduct, unit: event.target.value })}
+                  disabled={unitsLoading || Boolean(unitsError)}
+                  required
+                >
+                  <option value="">{unitsLoading ? "Loading units..." : "Select unit"}</option>
+                  {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label}</option>)}
+                </select>
               </Field>
               <Field label={`Production quantity${finishedProduct.unit.trim() ? ` (${finishedProduct.unit.trim()})` : ""}`} required>
                 <input type="number" min="0.000001" step="0.000001" value={outputQuantity} onChange={(event) => setOutputQuantity(event.target.value)} required />
@@ -310,8 +320,10 @@ export default function Manufacturing() {
             })}
             <div className="form-actions">
               <button type="button" className="button" disabled={saving} onClick={() => setMaterials((current) => [...current, emptyMaterial()])}>Add material</button>
-              <button className="button button-primary" disabled={saving || loading || !rawMaterials.length}>{saving ? "Posting run..." : "Complete run"}</button>
+              <button className="button button-primary" disabled={saving || loading || unitsLoading || Boolean(unitsError) || !units.length || !rawMaterials.length}>{saving ? "Posting run..." : "Complete run"}</button>
+              {unitsError && <button type="button" className="button" onClick={loadUnits} disabled={unitsLoading}>Retry loading units</button>}
             </div>
+            {unitsError && <p className="form-hint">Unable to load unit options: {unitsError}</p>}
             {!rawMaterials.length && <p className="form-hint">A raw material with a configured unit is required.</p>}
           </form>
         </section>
