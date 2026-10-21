@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { Alert, DataTable, Field, formatMoney, Loading, PageTitle } from "../components/Common.jsx";
+import useUnits from "../hooks/useUnits.js";
 
 const blankProduct = {
   name: "",
@@ -12,6 +13,7 @@ const blankProduct = {
 export default function Products() {
   const { isOwner } = useAuth();
   const [products, setProducts] = useState([]);
+  const { units, loading: unitsLoading, error: unitsError, reload: loadUnits } = useUnits();
   const [form, setForm] = useState(blankProduct);
   const [editingId, setEditingId] = useState("");
   const [selected, setSelected] = useState(null);
@@ -60,7 +62,7 @@ export default function Products() {
       ...form,
       name: form.name.trim(),
       classification: form.classification,
-      unit: form.unit.trim() || null,
+      unit: form.unit,
     };
     try {
       if (editingId) await api.put(`/products/${editingId}`, payload);
@@ -125,6 +127,7 @@ export default function Products() {
     <>
       <PageTitle title="Buying products" subtitle="Create products for purchasing; finished goods can be configured for selling without creating a second product record." />
       <Alert message={error} />
+      <Alert message={unitsError ? `Unable to load unit options: ${unitsError}` : ""} />
       <Alert kind="success" message={success} />
       {isOwner && (
         <section className="panel">
@@ -140,15 +143,19 @@ export default function Products() {
               </select>
             </Field>
             <Field label="Unit" required>
-              <input
+              <select
                 value={form.unit}
                 onChange={(event) => setForm({ ...form, unit: event.target.value })}
-                placeholder={editingId ? "Not set" : "e.g. piece, kg"}
+                disabled={unitsLoading || Boolean(unitsError)}
                 required
-              />
+              >
+                <option value="">{unitsLoading ? "Loading units..." : "Select unit"}</option>
+                {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label}</option>)}
+              </select>
             </Field>
             <div className="form-actions">
-              <button className="button button-primary" disabled={saving}>{saving ? "Saving..." : editingId ? "Save changes" : "Create buying product"}</button>
+              <button className="button button-primary" disabled={saving || unitsLoading || Boolean(unitsError) || !units.length}>{saving ? "Saving..." : editingId ? "Save changes" : "Create buying product"}</button>
+              {unitsError && <button type="button" className="button" onClick={loadUnits} disabled={unitsLoading}>Retry loading units</button>}
               {editingId && <button type="button" className="button" onClick={clearForm}>Cancel</button>}
             </div>
           </form>
