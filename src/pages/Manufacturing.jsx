@@ -245,8 +245,8 @@ export default function Manufacturing() {
 
   const previewColumns = [
     { key: "material", label: "Material", render: (row) => row.product?.name || "Select a product" },
-    { key: "quantity", label: "Calculated / consumed quantity", render: (row) => row.quantityMicros === null ? "Unknown" : `${quantityString(row.quantityMicros)} ${row.product?.unit || ""}${row.line.inputMode === "COST" ? " (estimated)" : ""}` },
-    { key: "cost", label: "Known material cost", render: (row) => row.costCents === null ? "Unresolved" : `${formatMoney(centsString(row.costCents))}${row.rounded ? " (rounded)" : ""}` },
+    { key: "quantity", label: "Calculated / consumed quantity", align: "right", render: (row) => row.quantityMicros === null ? "Unknown" : `${quantityString(row.quantityMicros)} ${row.product?.unit || ""}${row.line.inputMode === "COST" ? " (estimated)" : ""}` },
+    { key: "cost", label: "Known material cost", align: "right", render: (row) => row.costCents === null ? "Unresolved" : `${formatMoney(centsString(row.costCents))}${row.rounded ? " (rounded)" : ""}` },
   ];
 
   return (

@@ -7,8 +7,8 @@ import { isAtLeastQuantity, sellingInventoryTotal } from "../utils/quantity.js";
 const matchedColumns = [
   { key: "shopifyName", label: "Product" },
   { key: "sku", label: "SKU" },
-  { key: "emsListedQuantity", label: "EMS listed" },
-  { key: "shopifyAvailableQuantity", label: "Shopify available" },
+  { key: "emsListedQuantity", label: "EMS listed", align: "right" },
+  { key: "shopifyAvailableQuantity", label: "Shopify available", align: "right" },
 ];
 
 const unmatchedShopifyColumns = [
@@ -28,10 +28,12 @@ const duplicateSkuColumns = [
   {
     key: "variantCount",
     label: "Variant count",
+    align: "right",
   },
   {
     key: "proposedTotalForReview",
     label: "Proposed total (review only)",
+    align: "right",
     render: (row) => row.proposedTotalForReview ?? "Unavailable",
   },
   {
@@ -80,9 +82,9 @@ const mappingConflictColumns = [
 
 const appliedColumns = [
   { key: "sku", label: "SKU" },
-  { key: "previousListedQuantity", label: "Previous listed" },
-  { key: "shopifyAvailableQuantity", label: "Shopify available" },
-  { key: "quantityChange", label: "Change" },
+  { key: "previousListedQuantity", label: "Previous listed", align: "right" },
+  { key: "shopifyAvailableQuantity", label: "Shopify available", align: "right" },
+  { key: "quantityChange", label: "Change", align: "right" },
 ];
 
 export default function Inventory() {
@@ -258,16 +260,16 @@ export default function Inventory() {
   const stockColumns = [
     { key: "name", label: "Product" },
     { key: "sku", label: "SKU" },
-    { key: "warehouse", label: "Warehouse / unlisted", render: (row) => row.stock?.find((entry) => entry.bucket === "WAREHOUSE")?.quantity ?? 0 },
-    { key: "shopify", label: "Shopify listed", render: (row) => row.stock?.find((entry) => entry.bucket === "SHOPIFY_LISTED")?.quantity ?? 0 },
-    { key: "total", label: "Total tracked", render: (row) => sellingInventoryTotal(row.stock) },
+    { key: "warehouse", label: "Warehouse / unlisted", align: "right", render: (row) => row.stock?.find((entry) => entry.bucket === "WAREHOUSE")?.quantity ?? 0 },
+    { key: "shopify", label: "Shopify listed", align: "right", render: (row) => row.stock?.find((entry) => entry.bucket === "SHOPIFY_LISTED")?.quantity ?? 0 },
+    { key: "total", label: "Total tracked", align: "right", render: (row) => sellingInventoryTotal(row.stock) },
   ];
   const movementColumns = [
     { key: "createdAt", label: "Date", render: (row) => formatDate(row.createdAt) },
     { key: "product", label: "Product", render: (row) => row.product?.name || "—" },
     { key: "type", label: "Movement" },
     { key: "bucket", label: "Bucket" },
-    { key: "quantityChange", label: "Quantity change" },
+    { key: "quantityChange", label: "Quantity change", align: "right" },
     { key: "reason", label: "Reason" },
     { key: "actor", label: "By", render: (row) => row.actor?.name || "System" },
   ];

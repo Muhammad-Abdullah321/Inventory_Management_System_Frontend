@@ -31,9 +31,9 @@ export default function BillingRecords() {
   const columns = [
     { key: "vendorName", label: "Vendor" },
     { key: "productNames", label: "Products", render: (row) => row.productNames.join(", ") || "—" },
-    { key: "totalPurchaseAmount", label: "Total purchases", render: (row) => formatMoney(row.totalPurchaseAmount) },
-    { key: "amountPaid", label: "Amount paid", render: (row) => formatMoney(row.amountPaid) },
-    { key: "outstandingBalance", label: "Outstanding balance", render: (row) => formatMoney(row.outstandingBalance) },
+    { key: "totalPurchaseAmount", label: "Total purchases", align: "right", render: (row) => formatMoney(row.totalPurchaseAmount) },
+    { key: "amountPaid", label: "Amount paid", align: "right", render: (row) => formatMoney(row.amountPaid) },
+    { key: "outstandingBalance", label: "Outstanding balance", align: "right", render: (row) => formatMoney(row.outstandingBalance) },
   ];
 
   return (

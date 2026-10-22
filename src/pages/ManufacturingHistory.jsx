@@ -51,12 +51,13 @@ export default function ManufacturingHistory() {
 
   const runColumns = [
     { key: "finishedProduct", label: "Finished product", render: (run) => run.finishedProduct?.name || run.finishedProduct?.sku || "—" },
-    { key: "output", label: "Output", render: (run) => `${run.outputQuantity} ${run.outputUnit}` },
+    { key: "output", label: "Output", align: "right", render: (run) => `${run.outputQuantity} ${run.outputUnit}` },
     { key: "createdAt", label: "Date", render: (run) => formatDate(run.createdAt) },
     { key: "costing", label: "Costing status", render: costingLabel },
     {
       key: "materialCost",
       label: "Known material cost",
+      align: "right",
       render: (run) => run.knownMaterialCostSubtotal == null
         ? "Unresolved"
         : `${formatMoney(run.knownMaterialCostSubtotal)} (materials only)`,
@@ -68,15 +69,16 @@ export default function ManufacturingHistory() {
     {
       key: "enteredInput",
       label: "Entered input",
+      align: "right",
       render: (material) => material.inputMode === "QUANTITY"
         ? `${material.enteredQuantity} ${material.unit} (quantity)`
         : `${formatMoney(material.enteredCost)} (cost)`,
     },
-    { key: "consumed", label: "Consumed", render: (material) => `${material.consumedQuantity} ${material.unit}` },
+    { key: "consumed", label: "Consumed", align: "right", render: (material) => `${material.consumedQuantity} ${material.unit}` },
     { key: "source", label: "Purchase cost source", render: (material) => material.sourcePurchaseItem
       ? `Purchase line ${material.sourcePurchaseItem.id}: ${material.sourcePurchaseItem.quantity} ${material.sourcePurchaseItem.unit || material.unit} for ${formatMoney(material.sourcePurchaseItem.totalCost)}; ${formatMoney(material.sourcePurchaseItem.unitCost)} per ${material.sourcePurchaseItem.unit || material.unit}`
       : "No purchase cost source" },
-    { key: "materialCost", label: "Known material cost", render: (material) => material.materialCost == null
+    { key: "materialCost", label: "Known material cost", align: "right", render: (material) => material.materialCost == null
       ? "Unresolved"
       : `${formatMoney(material.materialCost)}${material.costStatus === "ROUNDED" ? " (rounded)" : ""}` },
     { key: "costStatus", label: "Cost status" },

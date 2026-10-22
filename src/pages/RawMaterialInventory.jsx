@@ -177,10 +177,11 @@ export default function RawMaterialInventory() {
     { key: "classification", label: "Classification" },
     { key: "sku", label: "SKU" },
     { key: "unit", label: "Unit", render: (product) => product.unit || "Not set" },
-    { key: "buyingQuantity", label: "Buying inventory quantity" },
+    { key: "buyingQuantity", label: "Buying inventory quantity", align: "right" },
     {
       key: "latestRecordedCost",
       label: "Latest known purchase cost",
+      align: "right",
       render: (product) => product.latestRecordedCost
         ? `${formatMoney(product.latestRecordedCost.unitCost)} / ${product.latestRecordedCost.unit}`
         : "Unavailable",

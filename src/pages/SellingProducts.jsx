@@ -71,7 +71,7 @@ export default function SellingProducts() {
     { key: "name", label: "Finished product" },
     { key: "sku", label: "SKU" },
     { key: "unit", label: "Unit", render: (product) => product.unit || "Not set" },
-    { key: "sellingPrice", label: "Selling price", render: (product) => product.isSellingConfigured ? formatMoney(product.sellingPrice) : "Not configured" },
+    { key: "sellingPrice", label: "Selling price", align: "right", render: (product) => product.isSellingConfigured ? formatMoney(product.sellingPrice) : "Not configured" },
     { key: "actions", label: "Actions", render: (product) => isOwner
       ? <button className="button button-small" disabled={!product.unit} onClick={() => beginEdit(product)}>{product.isSellingConfigured ? "Edit selling details" : "Configure for selling"}</button>
       : "—" },

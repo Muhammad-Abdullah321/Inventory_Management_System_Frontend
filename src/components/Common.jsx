@@ -88,12 +88,28 @@ export function DataTable({ columns, rows, emptyMessage = "No records found.", r
   return (
     <div className="table-wrap">
       <Table>
-        <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.key}>{column.label}</TableHead>)}</TableRow></TableHeader>
+        <TableHeader>
+          <TableRow>
+            {columns.map((column) => (
+              <TableHead
+                key={column.key}
+                className={column.align === "right" ? "text-right tabular-nums whitespace-nowrap" : undefined}
+              >
+                {column.label}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
         <TableBody>
           {rows.map((row, index) => (
             <TableRow key={row[rowKey] || index}>
               {columns.map((column) => (
-                <TableCell key={column.key}>{column.render ? column.render(row) : (row[column.key] ?? "—")}</TableCell>
+                <TableCell
+                  key={column.key}
+                  className={column.align === "right" ? "text-right tabular-nums whitespace-nowrap" : undefined}
+                >
+                  {column.render ? column.render(row) : (row[column.key] ?? "—")}
+                </TableCell>
               ))}
             </TableRow>
           ))}

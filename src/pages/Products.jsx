@@ -110,10 +110,10 @@ export default function Products() {
       </span>
     ) },
     { key: "unit", label: "Unit", render: (row) => row.unit || "Not set" },
-    { key: "sellingPrice", label: "Selling setup", render: (row) => row.isSellingConfigured
+    { key: "sellingPrice", label: "Selling setup", align: "right", render: (row) => row.isSellingConfigured
       ? <span className="product-selling-setup">{formatMoney(row.sellingPrice)}</span>
       : <span className="record-badge record-badge-muted">Not configured</span> },
-    { key: "stock", label: "Buying / warehouse", render: (row) => `${row.stock?.find((entry) => entry.bucket === "BUYING")?.quantity ?? 0} / ${row.stock?.find((entry) => entry.bucket === "WAREHOUSE")?.quantity ?? 0}` },
+    { key: "stock", label: "Buying / warehouse", align: "right", render: (row) => `${row.stock?.find((entry) => entry.bucket === "BUYING")?.quantity ?? 0} / ${row.stock?.find((entry) => entry.bucket === "WAREHOUSE")?.quantity ?? 0}` },
     { key: "actions", label: "Actions", render: (row) => (
       <div className="table-actions">
         <button className="button button-small" onClick={() => viewProduct(row)}>Details</button>

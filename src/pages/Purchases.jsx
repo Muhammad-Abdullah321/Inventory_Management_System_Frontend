@@ -128,10 +128,10 @@ export default function Purchases() {
   const purchaseColumns = [
     { key: "purchaseDate", label: "Purchase date", render: (row) => formatDate(row.purchaseDate) },
     { key: "vendor", label: "Vendor", render: (row) => row.vendor?.name || "—" },
-    { key: "items", label: "Lines", render: (row) => row.items?.length ?? 0 },
-    { key: "totalCost", label: "Total", render: (row) => formatMoney(row.totalCost) },
-    { key: "amountPaid", label: "Paid", render: (row) => formatMoney(row.amountPaid) },
-    { key: "outstandingBalance", label: "Outstanding", render: (row) => formatMoney(row.outstandingBalance) },
+    { key: "items", label: "Lines", align: "right", render: (row) => row.items?.length ?? 0 },
+    { key: "totalCost", label: "Total", align: "right", render: (row) => formatMoney(row.totalCost) },
+    { key: "amountPaid", label: "Paid", align: "right", render: (row) => formatMoney(row.amountPaid) },
+    { key: "outstandingBalance", label: "Outstanding", align: "right", render: (row) => formatMoney(row.outstandingBalance) },
     { key: "actions", label: "Actions", render: (row) => <button className="button button-small" onClick={() => viewPurchase(row)}>Details / payment</button> },
   ];
   const purchasableProducts = products.filter((product) =>
@@ -219,16 +219,16 @@ export default function Purchases() {
           <div className="purchase-items-heading"><h3 className="subheading">Purchased items</h3></div>
         <DataTable columns={[
           { key: "product", label: "Product", render: (row) => row.product?.name || "—" },
-          { key: "quantity", label: "Quantity" },
-          { key: "unitCost", label: "Unit cost", render: (row) => formatMoney(row.unitCost) },
-          { key: "totalCost", label: "Line total", render: (row) => formatMoney(row.totalCost) },
+          { key: "quantity", label: "Quantity", align: "right" },
+          { key: "unitCost", label: "Unit cost", align: "right", render: (row) => formatMoney(row.unitCost) },
+          { key: "totalCost", label: "Line total", align: "right", render: (row) => formatMoney(row.totalCost) },
         ]} rows={selected.items || []} emptyMessage="No purchase line items." />
         </div>
         <div className="purchase-detail-section">
         <div className="purchase-items-heading"><h3 className="subheading">Payment history</h3></div>
         <DataTable columns={[
           { key: "paymentDate", label: "Date", render: (row) => formatDate(row.paymentDate) },
-          { key: "amount", label: "Amount", render: (row) => formatMoney(row.amount) },
+          { key: "amount", label: "Amount", align: "right", render: (row) => formatMoney(row.amount) },
           { key: "reference", label: "Reference" },
         ]} rows={selected.payments || []} emptyMessage="No payments recorded." />
         </div>
