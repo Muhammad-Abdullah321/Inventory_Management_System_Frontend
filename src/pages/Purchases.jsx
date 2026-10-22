@@ -13,6 +13,8 @@ export default function Purchases() {
   const [vendorId, setVendorId] = useState("");
   const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().slice(0, 10));
   const [items, setItems] = useState([{ ...emptyLine }]);
+  const [initialPaymentMode, setInitialPaymentMode] = useState("CREDIT");
+  const [initialPaymentAmount, setInitialPaymentAmount] = useState("");
   const [selected, setSelected] = useState(null);
   const [payment, setPayment] = useState({ amount: "", paymentDate: new Date().toISOString().slice(0, 10), reference: "" });
   const [loading, setLoading] = useState(true);
@@ -59,11 +61,23 @@ export default function Purchases() {
           quantity: item.quantity,
           totalPrice: item.totalPrice,
         })),
+        ...(isOwner
+          ? {
+              initialPayment: {
+                mode: initialPaymentMode,
+                ...(initialPaymentMode === "PARTIAL"
+                  ? { amount: initialPaymentAmount }
+                  : {}),
+              },
+            }
+          : {}),
       });
-      setSuccess(`Purchase recorded. Total ${formatMoney(response.data.data.totalCost)}; buying inventory has been updated.`);
+      setSuccess(`Purchase recorded. Total ${formatMoney(response.data.data.totalCost)}; paid ${formatMoney(response.data.data.amountPaid)}; buying inventory has been updated.`);
       setVendorId("");
       setPurchaseDate(new Date().toISOString().slice(0, 10));
       setItems([{ ...emptyLine }]);
+      setInitialPaymentMode("CREDIT");
+      setInitialPaymentAmount("");
       await loadPurchases();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
@@ -157,6 +171,30 @@ export default function Purchases() {
               <button type="button" className="button button-small remove-line" disabled={items.length === 1} onClick={() => setItems((current) => current.filter((_, lineIndex) => lineIndex !== index))}>Remove</button>
             </div>
           ))}
+          {isOwner && <>
+            <Field label="Initial payment">
+              <select
+                value={initialPaymentMode}
+                onChange={(event) => setInitialPaymentMode(event.target.value)}
+              >
+                <option value="PAID">Paid</option>
+                <option value="PARTIAL">Partially Paid</option>
+                <option value="CREDIT">Credit</option>
+              </select>
+            </Field>
+            {initialPaymentMode === "PARTIAL" && (
+              <Field label="Initial payment amount" required>
+                <input
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={initialPaymentAmount}
+                  onChange={(event) => setInitialPaymentAmount(event.target.value)}
+                  required
+                />
+              </Field>
+            )}
+          </>}
           <div className="form-actions">
             <button type="button" className="button" onClick={() => setItems((current) => [...current, { ...emptyLine }])}>Add item</button>
             <button className="button button-primary" disabled={saving || vendors.length === 0 || purchasableProducts.length === 0}>{saving ? "Submitting..." : "Record purchase"}</button>

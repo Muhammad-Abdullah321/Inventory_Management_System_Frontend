@@ -12,6 +12,7 @@ import Manufacturing from "./pages/Manufacturing.jsx";
 import ManufacturingHistory from "./pages/ManufacturingHistory.jsx";
 import SellingProducts from "./pages/SellingProducts.jsx";
 import RawMaterialInventory from "./pages/RawMaterialInventory.jsx";
+import BillingRecords from "./pages/BillingRecords.jsx";
 
 function RequireAuth({ children, ownerOnly = false }) {
   const { user, isOwner } = useAuth();
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="selling-products" element={<SellingProducts />} />
         <Route path="vendors" element={<Vendors />} />
         <Route path="purchases" element={<Purchases />} />
+        <Route path="billing" element={<BillingRecords />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="raw-inventory" element={<RawMaterialInventory />} />
         <Route path="manufacturing" element={<OwnerRoute><Manufacturing /></OwnerRoute>} />
