@@ -195,13 +195,15 @@ export default function RawMaterialInventory() {
   ];
 
   return (
-    <>
+    <div className="inventory-page buying-inventory-page">
       <PageTitle title="Buying inventory" subtitle="Purchased raw materials and ready-made finished goods, with recorded purchase costs" />
       <Alert message={error} />
       <Alert kind="success" message={success} />
       {isOwner && (
-        <section className="panel">
-          <div className="section-heading"><h2>Adjust buying inventory</h2></div>
+        <section className="panel inventory-workflow-panel inventory-adjustment-panel">
+          <div className="section-heading">
+            <div><h2>Adjust buying inventory</h2><p className="inventory-section-copy">Record a reason for every manual buying-stock correction.</p></div>
+          </div>
           <form className="form-grid" onSubmit={submitAdjustment}>
             <Field label="Buying product" required>
               <select value={productId} onChange={(event) => setProductId(event.target.value)} required>
@@ -223,8 +225,10 @@ export default function RawMaterialInventory() {
         </section>
       )}
       {isOwner && (
-        <section className="panel">
-          <div className="section-heading"><h2>Transfer finished goods to selling warehouse</h2></div>
+        <section className="panel inventory-workflow-panel buying-transfer-panel">
+          <div className="section-heading">
+            <div><h2>Transfer finished goods to selling warehouse</h2><p className="inventory-section-copy">Move finished goods from buying stock into warehouse stock. Total tracked quantity is preserved.</p></div>
+          </div>
           <form className="form-grid" onSubmit={submitTransfer}>
             <Field label="Finished good" required>
               <select value={finishedGoodId} onChange={(event) => {
@@ -281,13 +285,13 @@ export default function RawMaterialInventory() {
             )}
             <div className="form-actions">
               <button className="button button-primary" disabled={saving || !finishedGoodId}>{saving ? "Submitting..." : "Transfer to selling warehouse"}</button>
-              <span className="form-hint">Available buying quantity: {transferableQuantity}. The transfer preserves total tracked quantity.</span>
+              <span className="form-hint">Source: buying stock ({transferableQuantity} available). Destination: warehouse. The transfer preserves total tracked quantity.</span>
             </div>
             {!finishedGoods.length && <p className="form-hint full-width">Create a finished-good buying product before transferring stock.</p>}
           </form>
         </section>
       )}
-      <section className="panel">
+      <section className="panel inventory-stock-panel">
         <div className="section-heading">
           <h2>Buying stock</h2>
           <button className="button button-small" onClick={loadInventory} disabled={loading}>Refresh</button>
@@ -299,6 +303,6 @@ export default function RawMaterialInventory() {
           <p className="form-hint">Known cost is the latest purchase-line unit cost with a unit matching the product’s current unit. Historical lines without a compatible unit are not used. Quantities shown are buying stock only.</p>
         )}
       </section>
-    </>
+    </div>
   );
 }

@@ -564,3 +564,66 @@ legend { color: var(--text); }
 @media (max-width: 380px) {
   .dashboard-stats { grid-template-columns: minmax(0, 1fr); }
 }
+
+.inventory-page { min-width: 0; }
+.inventory-page > .panel { min-width: 0; }
+.inventory-page .section-heading { align-items: flex-start; }
+.inventory-page .section-heading h2 { line-height: 1.35; }
+.inventory-section-copy { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.inventory-workflow-panel { border-inline-start: 3px solid var(--primary); }
+.buying-transfer-panel { border-inline-start-color: var(--teal); }
+.inventory-workflow-panel .form-grid { align-items: end; }
+.inventory-workflow-panel .form-actions { align-items: center; }
+.inventory-stock-panel .form-hint { margin-top: 12px; line-height: 1.55; }
+.inventory-page .table-wrap { max-width: 100%; }
+.inventory-page td { overflow-wrap: anywhere; }
+.inventory-shopify-panel { border-color: var(--line-strong); }
+.inventory-shopify-panel > .form-hint { max-width: 1000px; margin-bottom: 18px; line-height: 1.6; }
+.inventory-shopify-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.inventory-shopify-summary .stat-card {
+  min-width: 0;
+  min-height: 90px;
+  padding: 13px 15px;
+  border-radius: 8px;
+  background: var(--surface-muted);
+}
+.inventory-shopify-summary .stat-card > span { line-height: 1.4; }
+.inventory-shopify-summary .stat-card strong { margin: 9px 0 0; color: var(--text); font-size: 23px; }
+.inventory-review-section { min-width: 0; margin-top: 20px; }
+.inventory-review-section + .inventory-review-section { padding-top: 18px; border-top: 1px solid var(--line); }
+.inventory-review-section .section-heading { min-height: 24px; margin-bottom: 10px; }
+.inventory-review-section .section-heading h3 { margin: 0; color: var(--text); font-size: 14px; font-weight: 650; }
+.inventory-review-section details { min-width: 170px; max-width: 440px; }
+.inventory-review-section summary { color: var(--primary); cursor: pointer; font-weight: 600; }
+.inventory-review-section details ul { margin: 10px 0 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.55; overflow-wrap: anywhere; }
+.inventory-shopify-apply {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--info-border);
+  border-radius: 8px;
+  background: var(--info-bg);
+}
+.inventory-shopify-apply .form-hint { color: var(--info-text); line-height: 1.5; }
+.inventory-shopify-result { border-inline-start: 3px solid var(--success-text); }
+.inventory-shopify-result > .form-hint { margin-bottom: 14px; line-height: 1.6; }
+.buying-transfer-panel fieldset { display: grid; gap: 10px; margin: 0; padding: 14px; }
+.buying-transfer-panel fieldset label { display: flex; align-items: flex-start; gap: 9px; color: var(--text-secondary); font-size: 13px; line-height: 1.45; }
+.buying-transfer-panel fieldset input { accent-color: var(--teal); }
+
+@media (max-width: 900px) {
+  .inventory-shopify-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .inventory-page .panel { padding: 15px; }
+  .inventory-page .section-heading { flex-wrap: wrap; }
+  .inventory-shopify-summary { gap: 8px; }
+  .inventory-shopify-summary .stat-card { min-height: 82px; padding: 11px; }
+  .inventory-shopify-summary .stat-card strong { font-size: 20px; }
+  .inventory-shopify-apply { align-items: stretch; flex-direction: column; }
+  .inventory-shopify-apply .button { width: 100%; }
+  .inventory-page .form-actions { flex-wrap: wrap; }
+  .inventory-page .form-actions .form-hint { flex-basis: 100%; }
+}
+@media (max-width: 380px) {
+  .inventory-shopify-summary { grid-template-columns: minmax(0, 1fr); }
+}

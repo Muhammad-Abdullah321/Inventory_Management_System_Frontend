@@ -273,8 +273,8 @@ export default function Inventory() {
   ];
 
   return (
-    <>
-      <PageTitle title="Selling inventory" subtitle="Finished-good stock allocated between warehouse (unlisted) and Shopify-listed buckets">
+    <div className="inventory-page finished-inventory-page">
+      <PageTitle title="Finished-goods inventory" subtitle="Track warehouse stock and its Shopify-listed allocation, transfers, adjustments, and sync activity.">
         {isOwner && (
           <button
             className="button button-primary"
@@ -288,7 +288,7 @@ export default function Inventory() {
       <Alert message={error} />
       <Alert kind="success" message={success} />
       {isOwner && shopifyPreview && (
-        <section className="panel" aria-labelledby="shopify-preview-title">
+        <section className="panel inventory-shopify-panel" aria-labelledby="shopify-preview-title">
           <div className="section-heading">
             <h2 id="shopify-preview-title">Shopify sync preview</h2>
             <button
@@ -302,7 +302,7 @@ export default function Inventory() {
           <p className="form-hint">
             Review the exact-SKU matches and warnings before applying. Proposed duplicate-SKU totals are for review only; duplicate SKUs remain skipped during apply. Apply fetches current Shopify data again.
           </p>
-          <div className="stat-grid">
+          <div className="stat-grid inventory-shopify-summary">
             <article className="stat-card"><span>Matched products</span><strong>{shopifyPreview.summary.matchedProducts}</strong></article>
             <article className="stat-card"><span>Unmatched Shopify variants</span><strong>{shopifyPreview.summary.unmatchedShopifyVariants}</strong></article>
             <article className="stat-card"><span>EMS products without match</span><strong>{shopifyPreview.summary.emsProductsWithoutShopifyMatch}</strong></article>
@@ -310,27 +310,27 @@ export default function Inventory() {
             <article className="stat-card"><span>Missing inventory data</span><strong>{shopifyPreview.summary.missingInventoryData}</strong></article>
             <article className="stat-card"><span>Mapping conflicts</span><strong>{shopifyPreview.summary.mappingConflicts}</strong></article>
           </div>
-          <section>
+          <section className="inventory-review-section">
             <div className="section-heading"><h3>Matched products</h3></div>
             <DataTable columns={matchedColumns} rows={shopifyPreview.matchedProducts} emptyMessage="No products are safe to match." />
           </section>
-          <section>
+          <section className="inventory-review-section">
             <div className="section-heading"><h3>Unmatched Shopify variants</h3></div>
             <DataTable columns={unmatchedShopifyColumns} rows={shopifyPreview.unmatchedShopifyVariants} emptyMessage="All Shopify variants have a unique EMS match." />
           </section>
-          <section>
+          <section className="inventory-review-section">
             <div className="section-heading"><h3>EMS products without a Shopify match</h3></div>
             <DataTable columns={unmatchedEmsColumns} rows={shopifyPreview.emsProductsWithoutShopifyMatch} emptyMessage="All EMS products have a unique Shopify match." />
           </section>
-          <section>
+          <section className="inventory-review-section">
             <div className="section-heading"><h3>Duplicate / ambiguous Shopify SKUs</h3></div>
             <DataTable columns={duplicateSkuColumns} rows={shopifyPreview.duplicateAmbiguousSkus} emptyMessage="No duplicate Shopify SKUs." />
           </section>
-          <section>
+          <section className="inventory-review-section">
             <div className="section-heading"><h3>Missing inventory data</h3></div>
             <DataTable columns={missingInventoryColumns} rows={shopifyPreview.missingInventoryData} emptyMessage="Inventory data is available for every Shopify variant." />
           </section>
-          <section>
+          <section className="inventory-review-section">
             <div className="section-heading"><h3>Shopify item mapping conflicts</h3></div>
             <DataTable columns={mappingConflictColumns} rows={shopifyPreview.mappingConflicts} emptyMessage="No item mapping conflicts." />
           </section>
@@ -340,7 +340,7 @@ export default function Inventory() {
               ? "Some inventory data is missing or invalid. The backend will refuse to apply a partial sync."
               : ""}
           />
-          <div className="form-actions">
+          <div className="form-actions inventory-shopify-apply">
             <button
               className="button button-primary"
               onClick={applyShopifySync}
@@ -353,7 +353,7 @@ export default function Inventory() {
         </section>
       )}
       {isOwner && shopifyResult && (
-        <section className="panel" aria-labelledby="shopify-result-title">
+        <section className="panel inventory-shopify-result" aria-labelledby="shopify-result-title">
           <div className="section-heading"><h2 id="shopify-result-title">Shopify sync result</h2></div>
           <p className="form-hint">
             Updated {shopifyResult.matchedProducts} products; recorded {shopifyResult.movementsRecorded} quantity movements.
@@ -365,8 +365,10 @@ export default function Inventory() {
           <DataTable columns={appliedColumns} rows={shopifyResult.updatedProducts} emptyMessage="No matched products required synchronization." />
         </section>
       )}
-      {isOwner && <section className="panel">
-        <div className="section-heading"><h2>Transfer finished goods to Shopify allocation</h2></div>
+      {isOwner && <section className="panel inventory-workflow-panel inventory-transfer-panel">
+        <div className="section-heading">
+          <div><h2>Transfer finished goods to Shopify allocation</h2><p className="inventory-section-copy">Move available units from warehouse stock to the Shopify-listed allocation.</p></div>
+        </div>
         <form className="form-grid" onSubmit={submitTransfer}>
           <Field label="Finished good" required>
             <select value={transferProductId} onChange={(event) => setTransferProductId(event.target.value)} required>
@@ -379,13 +381,15 @@ export default function Inventory() {
           </Field>
           <div className="form-actions">
             <button className="button button-primary" disabled={saving || !transferProductId || Boolean(shopifyPhase)}>{saving ? "Submitting..." : "Transfer stock"}</button>
-            <span className="form-hint">Available in warehouse: {transferWarehouseQuantity}. Transfers preserve total tracked stock.</span>
+            <span className="form-hint">Source: warehouse ({transferWarehouseQuantity} available). Destination: Shopify-listed. Transfers preserve total tracked stock.</span>
           </div>
           {transferableProducts.length === 0 && <p className="form-hint full-width">Classify a product as a finished good before transferring stock.</p>}
         </form>
       </section>}
-      {isOwner && <section className="panel">
-        <div className="section-heading"><h2>Adjust stock</h2></div>
+      {isOwner && <section className="panel inventory-workflow-panel inventory-adjustment-panel">
+        <div className="section-heading">
+          <div><h2>Adjust stock</h2><p className="inventory-section-copy">Record a reason for every manual stock correction.</p></div>
+        </div>
         <form className="form-grid" onSubmit={submitAdjustment}>
           <Field label="Product" required>
             <select value={productId} onChange={(event) => setProductId(event.target.value)} required>
@@ -408,15 +412,15 @@ export default function Inventory() {
           </div>
         </form>
       </section>}
-      <section className="panel">
+      <section className="panel inventory-stock-panel">
         <div className="section-heading"><h2>Finished-good stock</h2><button className="button button-small" onClick={loadInventory} disabled={loading || Boolean(shopifyPhase)}>Refresh</button></div>
         <p className="form-hint">Warehouse is unlisted owned stock. Shopify-listed is an allocation of owned stock, not additional inventory.</p>
         {loading ? <Loading label="Loading finished-good inventory..." /> : <DataTable columns={stockColumns} rows={sellingProducts} emptyMessage="No products are classified as finished goods." />}
       </section>
-      <section className="panel">
+      <section className="panel inventory-movement-panel">
         <div className="section-heading"><h2>Movement history</h2><span>Most recent 100</span></div>
         {loading ? <Loading label="Loading movements..." /> : <DataTable columns={movementColumns} rows={movements.filter((movement) => sellingProductIds.has(movement.productId))} emptyMessage="No finished-good inventory movements yet." />}
       </section>
-    </>
+    </div>
   );
 }
