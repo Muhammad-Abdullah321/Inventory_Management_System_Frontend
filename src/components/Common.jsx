@@ -1,3 +1,5 @@
+import { useTheme } from "../theme/ThemeContext.jsx";
+
 export function PageTitle({ title, subtitle, children }) {
   return (
     <div className="page-title">
@@ -7,6 +9,24 @@ export function PageTitle({ title, subtitle, children }) {
       </div>
       {children && <div className="page-title-actions">{children}</div>}
     </div>
+  );
+}
+
+export function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  const nextTheme = theme === "dark" ? "light" : "dark";
+
+  return (
+    <button
+      type="button"
+      className="button button-quiet theme-toggle"
+      onClick={toggleTheme}
+      aria-label={`Switch to ${nextTheme} theme`}
+      title={`Switch to ${nextTheme} theme`}
+    >
+      <span className="theme-toggle-icon" aria-hidden="true">{theme === "dark" ? "☀" : "◐"}</span>
+      <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+    </button>
   );
 }
 
