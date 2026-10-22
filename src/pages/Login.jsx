@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Alert, Field } from "../components/Common.jsx";
+import { Alert, Field, ThemeToggle } from "../components/Common.jsx";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { getErrorMessage } from "../api/client.js";
 
@@ -30,8 +30,9 @@ export default function Login() {
 
   return (
     <main className="login-page">
+      <div className="login-theme-toggle"><ThemeToggle /></div>
       <section className="login-card">
-        <div className="login-brand">EMS<span>Inventory workspace</span></div>
+        <div className="login-brand"><span className="brand-mark" aria-hidden="true">E</span><span className="login-brand-copy">EMS<span>Inventory workspace</span></span></div>
         <h1>Welcome back</h1>
         <p>Sign in with your EMS account.</p>
         <Alert message={error} />
