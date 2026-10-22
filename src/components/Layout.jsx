@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { ThemeToggle } from "./Common.jsx";
+import { Button } from "./ui/button.jsx";
+import { cn } from "../lib/utils.js";
 
 const icons = {
   Dashboard: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></>,
@@ -74,16 +77,20 @@ export default function Layout() {
             <span className="brand-mark" aria-hidden="true">E</span>
             <span className="brand-copy">EMS<span>Inventory workspace</span></span>
           </NavLink>
-          <button
+          <Button
             type="button"
-            className="icon-button sidebar-collapse"
+            variant="ghost"
+            size="icon"
+            className="sidebar-collapse text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground max-[760px]:hidden"
             onClick={() => setCollapsed((value) => !value)}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-expanded={!collapsed}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d={collapsed ? "m9 18 6-6-6-6" : "m15 18-6-6 6-6"} /></svg>
-          </button>
+            {collapsed
+              ? <ChevronRight aria-hidden="true" />
+              : <ChevronLeft aria-hidden="true" />}
+          </Button>
         </div>
         <nav aria-label={isOwner ? "Owner navigation" : "Worker navigation"}>
           {groups.map((group) => (
@@ -92,7 +99,10 @@ export default function Layout() {
               {group.links.map(([label, path, icon]) => (
                 <NavLink
                   end={path === "/"}
-                  className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+                  className={({ isActive }) => cn(
+                    "nav-link text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isActive && "active bg-sidebar-active text-sidebar-foreground",
+                  )}
                   to={path}
                   key={path}
                   onClick={closeMobileNavigation}
@@ -113,23 +123,34 @@ export default function Layout() {
       </aside>
       <div className="main-area">
         <header className="topbar">
-          <button
+          <Button
             type="button"
-            className="icon-button mobile-menu-button"
+            variant="ghost"
+            size="icon"
+            className="mobile-menu-button hidden text-secondary-foreground hover:bg-accent hover:text-foreground max-[760px]:inline-flex"
             aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={mobileOpen}
             aria-controls="main-sidebar"
             onClick={() => setMobileOpen((value) => !value)}
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true">{mobileOpen ? <path d="m6 6 12 12M18 6 6 18" /> : <path d="M4 6h16M4 12h16M4 18h16" />}</svg>
-          </button>
+            {mobileOpen
+              ? <X aria-hidden="true" />
+              : <Menu aria-hidden="true" />}
+          </Button>
           <div className="topbar-user">
             <strong>{user?.name || "Team member"}</strong>
             <span className="role-badge">{user?.role || "USER"}</span>
           </div>
           <div className="topbar-actions">
             <ThemeToggle />
-            <button className="button button-quiet logout-button" onClick={logout}>Log out</button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="logout-button"
+              onClick={logout}
+            >
+              Log out
+            </Button>
           </div>
         </header>
         <main className="content"><Outlet /></main>
