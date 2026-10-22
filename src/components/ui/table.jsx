@@ -13,7 +13,7 @@ export function TableHeader({ className, ...props }) {
   return (
     <thead
       className={cn(
-        "[&_tr]:border-b [&_tr]:border-border [&_th]:bg-muted/70 [&_th]:text-foreground",
+        "[&_tr]:border-b [&_tr]:border-border [&_th]:bg-muted/70",
         className,
       )}
       {...props}
@@ -52,7 +52,7 @@ export function TableHead({ className, ...props }) {
   return (
     <th
       className={cn(
-        "h-11 whitespace-nowrap border-b border-border px-3 py-3 text-left text-[11px] font-semibold tracking-[.045em] text-secondary-foreground uppercase align-middle",
+        "h-11 whitespace-nowrap border-b border-border bg-muted/70 px-3 py-3 text-left text-[11px] font-semibold tracking-[.07em] text-secondary-foreground uppercase align-middle",
         className,
       )}
       {...props}

@@ -37,7 +37,7 @@ export function ThemeToggle() {
   return (
     <Button
       type="button"
-      variant="ghost"
+      variant="outline"
       className="theme-toggle text-secondary-foreground hover:text-foreground"
       onClick={toggleTheme}
       aria-label={`Switch to ${nextTheme} theme`}

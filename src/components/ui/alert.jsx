@@ -12,7 +12,7 @@ export function Alert({ className, variant = "default", ...props }) {
   return (
     <div
       className={cn(
-        "relative flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-sm leading-5",
+        "relative flex w-full items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-sm leading-5 shadow-sm",
         alertVariants[variant] || alertVariants.default,
         className,
       )}
