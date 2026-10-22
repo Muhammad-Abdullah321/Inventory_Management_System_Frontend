@@ -104,9 +104,15 @@ export default function Products() {
   const columns = [
     { key: "name", label: "Product" },
     { key: "sku", label: "SKU" },
-    { key: "classification", label: "Classification" },
+    { key: "classification", label: "Product type", render: (row) => (
+      <span className={`record-badge product-classification classification-${row.classification.toLowerCase()}`}>
+        {row.classification === "RAW_MATERIAL" ? "Raw material" : row.classification === "FINISHED_GOOD" ? "Finished good" : row.classification}
+      </span>
+    ) },
     { key: "unit", label: "Unit", render: (row) => row.unit || "Not set" },
-    { key: "sellingPrice", label: "Selling price", render: (row) => row.isSellingConfigured ? formatMoney(row.sellingPrice) : "Not configured" },
+    { key: "sellingPrice", label: "Selling setup", render: (row) => row.isSellingConfigured
+      ? <span className="product-selling-setup">{formatMoney(row.sellingPrice)}</span>
+      : <span className="record-badge record-badge-muted">Not configured</span> },
     { key: "stock", label: "Buying / warehouse", render: (row) => `${row.stock?.find((entry) => entry.bucket === "BUYING")?.quantity ?? 0} / ${row.stock?.find((entry) => entry.bucket === "WAREHOUSE")?.quantity ?? 0}` },
     { key: "actions", label: "Actions", render: (row) => (
       <div className="table-actions">
@@ -124,14 +130,16 @@ export default function Products() {
   const unresolvedProducts = products.filter((product) => product.classification === "UNRESOLVED");
 
   return (
-    <>
-      <PageTitle title="Buying products" subtitle="Create products for purchasing; finished goods can be configured for selling without creating a second product record." />
+    <div className="catalog-page buying-products-page">
+      <PageTitle title="Buying products" subtitle="Manage the products available for purchasing and receiving into buying inventory." />
       <Alert message={error} />
       <Alert message={unitsError ? `Unable to load unit options: ${unitsError}` : ""} />
       <Alert kind="success" message={success} />
       {isOwner && (
-        <section className="panel">
-          <div className="section-heading"><h2>{editingId ? "Edit product" : "Add product"}</h2></div>
+        <section className="panel catalog-form-panel">
+          <div className="section-heading">
+            <div><h2>{editingId ? "Edit product" : "Add product"}</h2><p className="catalog-section-copy">Buying setup uses product name, classification, and unit. Selling setup is managed separately.</p></div>
+          </div>
           <form className="form-grid" onSubmit={submit}>
             <Field label="Product name" required><input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required /></Field>
             <Field label="Classification" required>
@@ -159,11 +167,11 @@ export default function Products() {
               {editingId && <button type="button" className="button" onClick={clearForm}>Cancel</button>}
             </div>
           </form>
-          <p className="form-hint">Buying setup requires name, classification, and unit only. Configure a finished good for selling separately. Product setup does not add stock.</p>
+          <p className="form-hint">Product setup does not add stock. Configure finished goods for selling on the separate Selling products page.</p>
         </section>
       )}
       {selected && (
-        <section className="panel detail-panel">
+        <section className="panel detail-panel catalog-detail-panel">
           <div className="section-heading"><h2>Product details</h2><button className="button button-small" onClick={() => setSelected(null)}>Close</button></div>
           <dl className="detail-grid">
             <div><dt>Name</dt><dd>{selected.name}</dd></div><div><dt>SKU</dt><dd>{selected.sku}</dd></div>
@@ -175,15 +183,17 @@ export default function Products() {
           </dl>
         </section>
       )}
-      <section className="panel">
-        <div className="section-heading"><h2>Purchasable product catalog</h2><button className="button button-small" onClick={loadProducts}>Refresh</button></div>
+      <section className="panel catalog-list-panel">
+        <div className="section-heading">
+          <div><h2>Purchasable product catalog</h2><p className="catalog-section-copy">Classified raw materials and finished goods available in the buying workflow.</p></div>
+          <button className="button button-small" onClick={loadProducts}>Refresh</button>
+        </div>
         {loading ? <Loading label="Loading products..." /> : <DataTable columns={columns} rows={buyingProducts} emptyMessage="No classified purchasable products yet. Add a raw material or finished good above." />}
       </section>
-      {!loading && unresolvedProducts.length > 0 && <section className="panel">
-        <div className="section-heading"><h2>Legacy products needing classification</h2></div>
-        <p className="form-hint">These existing products are unresolved and are not eligible for purchasing or manufacturing until classified.</p>
+      {!loading && unresolvedProducts.length > 0 && <section className="panel catalog-unresolved-panel">
+        <div className="section-heading"><div><h2>Legacy products needing classification</h2><p className="catalog-section-copy">Unresolved products are not eligible for purchasing or manufacturing.</p></div></div>
         <DataTable columns={columns} rows={unresolvedProducts} emptyMessage="No unresolved products." />
       </section>}
-    </>
+    </div>
   );
 }

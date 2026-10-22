@@ -627,3 +627,40 @@ legend { color: var(--text); }
 @media (max-width: 380px) {
   .inventory-shopify-summary { grid-template-columns: minmax(0, 1fr); }
 }
+.catalog-page, .vendor-page, .purchases-page, .billing-page { min-width: 0; }
+.catalog-page .panel, .vendor-page .panel, .purchases-page .panel, .billing-page .panel { min-width: 0; }
+.catalog-page .section-heading, .vendor-page .section-heading, .purchases-page .section-heading, .billing-page .section-heading {
+  align-items: flex-start;
+}
+.catalog-section-copy, .vendor-section-copy, .purchase-section-copy, .billing-section-copy {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.catalog-form-panel, .vendor-form-panel, .purchase-create-panel { border-inline-start: 3px solid var(--primary); }
+.catalog-page .table-wrap, .vendor-page .table-wrap, .purchases-page .table-wrap, .billing-page .table-wrap {
+  max-width: 100%;
+}
+.catalog-page td, .vendor-page td, .purchases-page td, .billing-page td {
+  overflow-wrap: anywhere;
+}
+.record-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--info-border);
+  border-radius: 999px;
+  background: var(--info-bg);
+  color: var(--info-text);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.classification-raw_material { border-color: color-mix(in srgb, var(--teal) 35%, var(--line)); background: color-mix(in srgb, var(--teal) 12%, var(--surface)); color: var(--teal); }
+.classification-finished_good { border-color: var(--info-border); background: var(--info-bg); color: var(--info-text); }
+.record-badge-muted { border-color: var(--line); background: var(--surface-muted); color: var(--muted); }
+.product-selling-setup { color: var(--text); font-weight: 650; white-space: nowrap; }
+.catalog-list-panel .table-actions { flex-wrap: wrap; }
