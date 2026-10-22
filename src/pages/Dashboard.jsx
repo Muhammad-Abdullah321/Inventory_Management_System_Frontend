@@ -51,43 +51,84 @@ export default function Dashboard() {
   ];
 
   return (
-    <>
-      <PageTitle title="Dashboard" subtitle="Current stock and inventory activity" />
+    <div className="dashboard-page">
+      <PageTitle title="Dashboard" subtitle="A current view of inventory, purchasing activity, and vendor payables." />
       <Alert message={error} />
-      <div className="filter-panel">
-        <Field label="From">
-          <input type="date" value={from} max={to} onChange={(event) => setFrom(event.target.value)} />
-        </Field>
-        <Field label="To">
-          <input type="date" value={to} min={from} onChange={(event) => setTo(event.target.value)} />
-        </Field>
-      </div>
-      {loading && <Loading label="Loading dashboard..." />}
+      <section className="panel dashboard-filter" aria-label="Dashboard date range">
+        <div className="dashboard-filter-copy">
+          <strong>Reporting period</strong>
+          <span>Purchase totals and daily movements use this date range.</span>
+        </div>
+        <div className="dashboard-date-fields">
+          <Field label="From">
+            <input type="date" value={from} max={to} onChange={(event) => setFrom(event.target.value)} />
+          </Field>
+          <span className="dashboard-date-separator" aria-hidden="true">to</span>
+          <Field label="To">
+            <input type="date" value={to} min={from} onChange={(event) => setTo(event.target.value)} />
+          </Field>
+        </div>
+      </section>
+      {loading && <div className="dashboard-state"><Loading label="Loading dashboard..." /></div>}
       {data && !loading && (
         <>
-          <section className="stat-grid">
-            <article className="stat-card"><span>Buying inventory</span><strong>{data.currentStock.buying ?? 0}</strong><small>Purchased stock and raw materials</small></article>
-            <article className="stat-card"><span>Warehouse stock</span><strong>{data.currentStock.warehouse}</strong><small>Current units</small></article>
-            <article className="stat-card"><span>Shopify-listed stock</span><strong>{data.currentStock.shopifyListed}</strong><small>Current units</small></article>
-            <article className="stat-card"><span>Purchases in period</span><strong>{data.periodPurchases.count}</strong><small>{data.periodPurchases.quantity} units received</small></article>
-            <article className="stat-card"><span>Purchase value</span><strong>{formatMoney(data.periodPurchases.value)}</strong><small>Selected date range</small></article>
-            <article className="stat-card"><span>Vendor payables</span><strong>{formatMoney(data.vendorPayables.total)}</strong><small>Outstanding total</small></article>
+          <section className="dashboard-stats" aria-label="Inventory and purchasing summary">
+            <article className="dashboard-stat dashboard-stat-buying">
+              <span className="dashboard-stat-label">Buying inventory</span>
+              <strong>{data.currentStock.buying ?? 0}</strong>
+              <small>Purchased stock and raw materials</small>
+            </article>
+            <article className="dashboard-stat dashboard-stat-warehouse">
+              <span className="dashboard-stat-label">Warehouse stock</span>
+              <strong>{data.currentStock.warehouse}</strong>
+              <small>Current units</small>
+            </article>
+            <article className="dashboard-stat dashboard-stat-shopify">
+              <span className="dashboard-stat-label">Shopify-listed stock</span>
+              <strong>{data.currentStock.shopifyListed}</strong>
+              <small>Current units</small>
+            </article>
+            <article className="dashboard-stat dashboard-stat-purchases">
+              <span className="dashboard-stat-label">Purchases in period</span>
+              <strong>{data.periodPurchases.count}</strong>
+              <small>{data.periodPurchases.quantity} units received</small>
+            </article>
+            <article className="dashboard-stat dashboard-stat-value">
+              <span className="dashboard-stat-label">Purchase value</span>
+              <strong>{formatMoney(data.periodPurchases.value)}</strong>
+              <small>Selected date range</small>
+            </article>
+            <article className="dashboard-stat dashboard-stat-payables">
+              <span className="dashboard-stat-label">Vendor payables</span>
+              <strong>{formatMoney(data.vendorPayables.total)}</strong>
+              <small>Outstanding total</small>
+            </article>
           </section>
-          <section className="panel">
-            <div className="section-heading"><h2>Recent movements</h2><span>Latest 10</span></div>
+          <section className="panel dashboard-panel dashboard-recent">
+            <div className="section-heading">
+              <div><h2>Recent movements</h2><p className="dashboard-section-subtitle">Latest inventory changes across products</p></div>
+              <span className="dashboard-section-tag">Latest 10</span>
+            </div>
             <DataTable columns={movementColumns} rows={data.recentMovements || []} emptyMessage="No inventory movements yet." />
           </section>
-          <section className="panel">
-            <div className="section-heading"><h2>Daily activity</h2><span>Selected date range</span></div>
-            <DataTable columns={dailyColumns} rows={data.dailyMovements || []} emptyMessage="No movement activity for these dates." />
-          </section>
-          <section className="panel">
-            <div className="section-heading"><h2>Outstanding by vendor</h2></div>
-            <DataTable columns={payableColumns} rows={data.vendorPayables.byVendor || []} emptyMessage="No outstanding vendor balances." />
-          </section>
+          <div className="dashboard-activity-grid">
+            <section className="panel dashboard-panel dashboard-daily">
+              <div className="section-heading">
+                <div><h2>Daily activity</h2><p className="dashboard-section-subtitle">Net movement by day and stock bucket</p></div>
+                <span className="dashboard-section-tag">Selected period</span>
+              </div>
+              <DataTable columns={dailyColumns} rows={data.dailyMovements || []} emptyMessage="No movement activity for these dates." />
+            </section>
+            <section className="panel dashboard-panel dashboard-payables">
+              <div className="section-heading">
+                <div><h2>Outstanding by vendor</h2><p className="dashboard-section-subtitle">Current outstanding balances, not limited to the selected reporting period</p></div>
+              </div>
+              <DataTable columns={payableColumns} rows={data.vendorPayables.byVendor || []} emptyMessage="No outstanding vendor balances." />
+            </section>
+          </div>
         </>
       )}
-      {!data && !loading && !error && <p className="muted">No dashboard data is available.</p>}
-    </>
+      {!data && !loading && !error && <div className="panel dashboard-empty"><p className="muted">No dashboard data is available.</p></div>}
+    </div>
   );
 }
