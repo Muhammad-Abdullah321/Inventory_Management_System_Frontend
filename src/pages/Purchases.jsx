@@ -139,14 +139,14 @@ export default function Purchases() {
   );
 
   return (
-    <>
-      <PageTitle title="Inventory purchases" subtitle="Receive goods and track purchase payments" />
+    <div className="purchases-page">
+      <PageTitle title="Inventory purchases" subtitle="Record goods received from vendors and review their payment history." />
       <Alert message={error} />
       <Alert kind="success" message={success} />
-      <section className="panel">
-        <div className="section-heading"><h2>Record purchase receipt</h2></div>
+      <section className="panel purchase-create-panel">
+        <div className="section-heading"><div><h2>Record purchase receipt</h2><p className="purchase-section-copy">Choose the vendor, add each purchased item, then set the initial payment when permitted.</p></div></div>
         <form className="form-stack" onSubmit={createPurchase}>
-          <div className="form-grid">
+          <div className="form-grid purchase-header-fields">
             <Field label="Vendor" required>
               <select value={vendorId} onChange={(event) => setVendorId(event.target.value)} required>
                 <option value="">Select vendor</option>
@@ -157,9 +157,9 @@ export default function Purchases() {
               <input type="date" value={purchaseDate} onChange={(event) => setPurchaseDate(event.target.value)} />
             </Field>
           </div>
-          <h3 className="subheading">Purchase items</h3>
+          <div className="purchase-items-heading"><h3 className="subheading">Purchase items</h3><p className="purchase-section-copy">Enter the quantity and total price for each purchase line.</p></div>
           {items.map((item, index) => (
-            <div className="line-item" key={index}>
+            <div className="line-item purchase-line-item" key={index}>
               <Field label="Product" required>
                 <select value={item.productId} onChange={(event) => updateItem(index, "productId", event.target.value)} required>
                   <option value="">Select product</option>
@@ -171,59 +171,68 @@ export default function Purchases() {
               <button type="button" className="button button-small remove-line" disabled={items.length === 1} onClick={() => setItems((current) => current.filter((_, lineIndex) => lineIndex !== index))}>Remove</button>
             </div>
           ))}
-          {isOwner && <>
-            <Field label="Initial payment">
-              <select
-                value={initialPaymentMode}
-                onChange={(event) => setInitialPaymentMode(event.target.value)}
-              >
-                <option value="PAID">Paid</option>
-                <option value="PARTIAL">Partially Paid</option>
-                <option value="CREDIT">Credit</option>
-              </select>
-            </Field>
-            {initialPaymentMode === "PARTIAL" && (
-              <Field label="Initial payment amount" required>
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={initialPaymentAmount}
-                  onChange={(event) => setInitialPaymentAmount(event.target.value)}
-                  required
-                />
+          {isOwner && <div className="purchase-initial-payment">
+            <h3>Initial payment</h3>
+            <p className="purchase-section-copy">Set the payment status for this purchase.</p>
+            <div className="form-grid">
+              <Field label="Payment status">
+                <select
+                  value={initialPaymentMode}
+                  onChange={(event) => setInitialPaymentMode(event.target.value)}
+                >
+                  <option value="PAID">Paid</option>
+                  <option value="PARTIAL">Partially Paid</option>
+                  <option value="CREDIT">Credit</option>
+                </select>
               </Field>
-            )}
-          </>}
-          <div className="form-actions">
+              {initialPaymentMode === "PARTIAL" && (
+                <Field label="Initial payment amount" required>
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={initialPaymentAmount}
+                    onChange={(event) => setInitialPaymentAmount(event.target.value)}
+                    required
+                  />
+                </Field>
+              )}
+            </div>
+          </div>}
+          <div className="form-actions purchase-form-actions">
             <button type="button" className="button" onClick={() => setItems((current) => [...current, { ...emptyLine }])}>Add item</button>
             <button className="button button-primary" disabled={saving || vendors.length === 0 || purchasableProducts.length === 0}>{saving ? "Submitting..." : "Record purchase"}</button>
           </div>
           {(vendors.length === 0 || purchasableProducts.length === 0) && <p className="form-hint">Add at least one vendor and one classified raw material or finished good before recording a purchase.</p>}
         </form>
       </section>
-      {selected && <section className="panel">
-        <div className="section-heading"><h2>Purchase details</h2><button className="button button-small" onClick={() => setSelected(null)}>Close</button></div>
+      {selected && <section className="panel purchase-details-panel">
+        <div className="section-heading"><div><h2>Purchase details</h2><p className="purchase-section-copy">Items, payment history, and current balance returned for this purchase.</p></div><button className="button button-small" onClick={() => setSelected(null)}>Close</button></div>
         <div className="purchase-summary">
-          <span>Vendor <strong>{selected.vendor?.name || "—"}</strong></span>
-          <span>Date <strong>{formatDate(selected.purchaseDate)}</strong></span>
-          <span>Total <strong>{formatMoney(selected.totalCost)}</strong></span>
-          <span>Paid <strong>{formatMoney(selected.amountPaid)}</strong></span>
-          <span>Outstanding <strong>{formatMoney(selected.outstandingBalance)}</strong></span>
+          <div className="purchase-summary-item"><span>Vendor</span><strong>{selected.vendor?.name || "—"}</strong></div>
+          <div className="purchase-summary-item"><span>Date</span><strong>{formatDate(selected.purchaseDate)}</strong></div>
+          <div className="purchase-summary-item"><span>Total</span><strong>{formatMoney(selected.totalCost)}</strong></div>
+          <div className="purchase-summary-item"><span>Paid</span><strong>{formatMoney(selected.amountPaid)}</strong></div>
+          <div className="purchase-summary-item"><span>Outstanding</span><strong>{formatMoney(selected.outstandingBalance)}</strong></div>
         </div>
+        <div className="purchase-detail-section">
+          <div className="purchase-items-heading"><h3 className="subheading">Purchased items</h3></div>
         <DataTable columns={[
           { key: "product", label: "Product", render: (row) => row.product?.name || "—" },
           { key: "quantity", label: "Quantity" },
           { key: "unitCost", label: "Unit cost", render: (row) => formatMoney(row.unitCost) },
           { key: "totalCost", label: "Line total", render: (row) => formatMoney(row.totalCost) },
         ]} rows={selected.items || []} emptyMessage="No purchase line items." />
-        <h3 className="subheading">Payments</h3>
+        </div>
+        <div className="purchase-detail-section">
+        <div className="purchase-items-heading"><h3 className="subheading">Payment history</h3></div>
         <DataTable columns={[
           { key: "paymentDate", label: "Date", render: (row) => formatDate(row.paymentDate) },
           { key: "amount", label: "Amount", render: (row) => formatMoney(row.amount) },
           { key: "reference", label: "Reference" },
         ]} rows={selected.payments || []} emptyMessage="No payments recorded." />
-        {isOwner && Number(selected.outstandingBalance) > 0 && <form className="form-grid payment-form" onSubmit={recordPayment}>
+        </div>
+        {isOwner && Number(selected.outstandingBalance) > 0 && <form className="form-grid payment-form purchase-payment-form" onSubmit={recordPayment}>
           <h3 className="subheading full-width">Record payment</h3>
           <Field label="Amount" required><input type="number" min="0.01" max={selected.outstandingBalance} step="0.01" value={payment.amount} onChange={(event) => setPayment({ ...payment, amount: event.target.value })} required /></Field>
           <Field label="Payment date"><input type="date" value={payment.paymentDate} onChange={(event) => setPayment({ ...payment, paymentDate: event.target.value })} /></Field>
@@ -231,10 +240,10 @@ export default function Purchases() {
           <div className="form-actions"><button className="button button-primary" disabled={saving}>{saving ? "Submitting..." : "Record payment"}</button></div>
         </form>}
       </section>}
-      <section className="panel">
-        <div className="section-heading"><h2>Purchase history</h2><button className="button button-small" onClick={loadPurchases}>Refresh</button></div>
+      <section className="panel purchase-history-panel">
+        <div className="section-heading"><div><h2>Purchase history</h2><p className="purchase-section-copy">Recent purchase receipts and their payment balances.</p></div><button className="button button-small" onClick={loadPurchases}>Refresh</button></div>
         {loading ? <Loading label="Loading purchases..." /> : <DataTable columns={purchaseColumns} rows={purchases} emptyMessage="No purchases recorded yet." />}
       </section>
-    </>
+    </div>
   );
 }

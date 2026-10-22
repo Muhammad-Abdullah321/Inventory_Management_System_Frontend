@@ -627,6 +627,7 @@ legend { color: var(--text); }
 @media (max-width: 380px) {
   .inventory-shopify-summary { grid-template-columns: minmax(0, 1fr); }
 }
+
 .catalog-page, .vendor-page, .purchases-page, .billing-page { min-width: 0; }
 .catalog-page .panel, .vendor-page .panel, .purchases-page .panel, .billing-page .panel { min-width: 0; }
 .catalog-page .section-heading, .vendor-page .section-heading, .purchases-page .section-heading, .billing-page .section-heading {
@@ -664,3 +665,76 @@ legend { color: var(--text); }
 .record-badge-muted { border-color: var(--line); background: var(--surface-muted); color: var(--muted); }
 .product-selling-setup { color: var(--text); font-weight: 650; white-space: nowrap; }
 .catalog-list-panel .table-actions { flex-wrap: wrap; }
+.vendor-detail-panel .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.billing-section .section-heading { align-items: center; }
+.billing-status-paid { border-color: var(--success-border); background: var(--success-bg); color: var(--success-text); }
+.billing-status-partially_paid { border-color: var(--warning-border); background: var(--warning-bg); color: var(--warning-text); }
+.billing-status-credit { border-color: var(--info-border); background: var(--info-bg); color: var(--info-text); }
+.billing-empty { padding-block: 24px; }
+.billing-empty .muted { margin: 0; }
+.billing-section-copy { max-width: 580px; }
+
+.purchase-create-panel .form-stack { gap: 18px; }
+.purchase-header-fields { max-width: 780px; }
+.purchase-items-heading { margin: 2px 0 0; }
+.purchase-items-heading .subheading { margin: 0; }
+.purchase-line-item { grid-template-columns: minmax(220px, 2fr) minmax(110px, .8fr) minmax(140px, 1fr) auto; }
+.purchase-line-item .field { min-width: 0; }
+.purchase-initial-payment {
+  display: grid;
+  gap: 12px;
+  max-width: 780px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-muted);
+}
+.purchase-initial-payment h3 { margin: 0; color: var(--text); font-size: 14px; }
+.purchase-initial-payment .form-grid { max-width: 680px; }
+.purchase-form-actions { padding-top: 2px; }
+.purchase-details-panel .purchase-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 20px;
+}
+.purchase-summary-item {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-muted);
+}
+.purchase-summary-item > span { display: block; color: var(--muted); font-size: 11px; }
+.purchase-summary-item strong { display: block; margin-top: 7px; color: var(--text); font-size: 14px; overflow-wrap: anywhere; }
+.purchase-detail-section { margin-top: 18px; }
+.purchase-detail-section .purchase-items-heading { margin-bottom: 10px; }
+.purchase-payment-form {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-muted);
+}
+.purchase-payment-form .subheading { margin: 0; }
+.purchase-history-panel .section-heading { align-items: flex-start; }
+
+@media (max-width: 900px) {
+  .purchase-details-panel .purchase-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .purchase-line-item { grid-template-columns: minmax(160px, 2fr) minmax(100px, 1fr) minmax(120px, 1fr) auto; }
+}
+@media (max-width: 600px) {
+  .catalog-page .panel, .vendor-page .panel, .purchases-page .panel, .billing-page .panel { padding: 15px; }
+  .catalog-page .section-heading, .vendor-page .section-heading, .purchases-page .section-heading, .billing-page .section-heading { flex-wrap: wrap; }
+  .purchase-details-panel .purchase-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .purchase-line-item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .purchase-line-item .field:first-child { grid-column: 1 / -1; }
+  .purchase-line-item .remove-line { justify-self: start; }
+  .purchase-form-actions { align-items: stretch; }
+  .purchase-form-actions .button { flex: 1 1 150px; }
+  .billing-section .billing-status-badge { margin-left: auto; }
+}
+@media (max-width: 380px) {
+  .purchase-details-panel .purchase-summary { grid-template-columns: minmax(0, 1fr); }
+  .vendor-detail-panel .detail-grid { grid-template-columns: minmax(0, 1fr); }
+}

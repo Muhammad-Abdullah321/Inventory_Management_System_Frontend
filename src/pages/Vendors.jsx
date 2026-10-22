@@ -100,12 +100,12 @@ export default function Vendors() {
   ];
 
   return (
-    <>
-      <PageTitle title="Vendors" subtitle="Manage supplier contact information" />
+    <div className="vendor-page">
+      <PageTitle title="Vendors" subtitle="Manage supplier contact details used in purchase records." />
       <Alert message={error} />
       <Alert kind="success" message={success} />
-      {isOwner && <section className="panel">
-        <div className="section-heading"><h2>{editingId ? "Edit vendor" : "Add vendor"}</h2></div>
+      {isOwner && <section className="panel vendor-form-panel">
+        <div className="section-heading"><div><h2>{editingId ? "Edit vendor" : "Add vendor"}</h2><p className="vendor-section-copy">Keep supplier contact information up to date.</p></div></div>
         <form className="form-grid" onSubmit={submit}>
           <Field label="Vendor name" required><input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required /></Field>
           <Field label="Phone"><input type="tel" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} /></Field>
@@ -117,17 +117,17 @@ export default function Vendors() {
           </div>
         </form>
       </section>}
-      {selected && <section className="panel">
-        <div className="section-heading"><h2>Vendor details</h2><button className="button button-small" onClick={() => setSelected(null)}>Close</button></div>
+      {selected && <section className="panel detail-panel vendor-detail-panel">
+        <div className="section-heading"><div><h2>Vendor details</h2><p className="vendor-section-copy">Contact information on file for this supplier.</p></div><button className="button button-small" onClick={() => setSelected(null)}>Close</button></div>
         <dl className="detail-grid">
           <div><dt>Name</dt><dd>{selected.name}</dd></div><div><dt>Phone</dt><dd>{selected.phone || "—"}</dd></div>
           <div><dt>Email</dt><dd>{selected.email || "—"}</dd></div><div><dt>Address</dt><dd>{selected.address || "—"}</dd></div>
         </dl>
       </section>}
-      <section className="panel">
-        <div className="section-heading"><h2>Vendor directory</h2><button className="button button-small" onClick={loadVendors}>Refresh</button></div>
+      <section className="panel vendor-list-panel">
+        <div className="section-heading"><div><h2>Vendor directory</h2><p className="vendor-section-copy">Supplier contact information returned by EMS.</p></div><button className="button button-small" onClick={loadVendors}>Refresh</button></div>
         {loading ? <Loading label="Loading vendors..." /> : <DataTable columns={columns} rows={vendors} emptyMessage="No vendors yet. Add a vendor above." />}
       </section>
-    </>
+    </div>
   );
 }
