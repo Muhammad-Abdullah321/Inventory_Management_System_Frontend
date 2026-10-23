@@ -26,3 +26,15 @@ export function sellingInventoryTotal(stock = []) {
       .map((entry) => entry.quantity)
   );
 }
+
+export function sellingInventorySummary(stock = [], shopifyInventorySyncedAt) {
+  const listedStock = stock.find((entry) => entry.bucket === "SHOPIFY_LISTED");
+  const warehouseStock = stock.find((entry) => entry.bucket === "WAREHOUSE");
+  const shopifyQuantityKnown = Boolean(shopifyInventorySyncedAt && listedStock);
+
+  return {
+    onShopify: shopifyQuantityKnown ? listedStock.quantity : null,
+    inWarehouse: warehouseStock?.quantity ?? 0,
+    totalAvailable: shopifyQuantityKnown ? sellingInventoryTotal(stock) : null,
+  };
+}
