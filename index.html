@@ -3,7 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f7fa" />
+    <meta name="theme-color" content="#f4f7fb" />
+    <script>
+      (() => {
+        try {
+          const savedTheme = localStorage.getItem("ems_theme");
+          const theme = savedTheme === "light" || savedTheme === "dark"
+            ? savedTheme
+            : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.dataset.theme = theme;
+          document.querySelector('meta[name="theme-color"]').content =
+            theme === "dark" ? "#101820" : "#f4f7fb";
+        } catch {
+          document.documentElement.dataset.theme =
+            window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.querySelector('meta[name="theme-color"]').content =
+            document.documentElement.dataset.theme === "dark" ? "#101820" : "#f4f7fb";
+        }
+      })();
+    </script>
     <title>EMS Inventory</title>
   </head>
   <body>

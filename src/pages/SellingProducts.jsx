@@ -71,7 +71,7 @@ export default function SellingProducts() {
     { key: "name", label: "Finished product" },
     { key: "sku", label: "SKU" },
     { key: "unit", label: "Unit", render: (product) => product.unit || "Not set" },
-    { key: "sellingPrice", label: "Selling price", render: (product) => product.isSellingConfigured ? formatMoney(product.sellingPrice) : "Not configured" },
+    { key: "sellingPrice", label: "Selling price", align: "right", render: (product) => product.isSellingConfigured ? formatMoney(product.sellingPrice) : "Not configured" },
     { key: "actions", label: "Actions", render: (product) => isOwner
       ? <button className="button button-small" disabled={!product.unit} onClick={() => beginEdit(product)}>{product.isSellingConfigured ? "Edit selling details" : "Configure for selling"}</button>
       : "—" },
@@ -80,14 +80,16 @@ export default function SellingProducts() {
   const candidates = products.filter((product) => !product.isSellingConfigured);
 
   return (
-    <>
-      <PageTitle title="Selling products" subtitle="Configure an existing finished-good product for selling without creating a duplicate product record" />
+    <div className="catalog-page selling-products-page">
+      <PageTitle title="Selling products" subtitle="Manage selling details for existing finished goods without creating duplicate product records." />
       <Alert message={error} />
       <Alert kind="success" message={success} />
       {candidates.some((product) => !product.unit) && <Alert message="Finished goods without a configured unit cannot be configured for selling until their unit is resolved." />}
       {isOwner && editingId && (
-        <section className="panel">
-          <div className="section-heading"><h2>Configure finished good for selling</h2></div>
+        <section className="panel catalog-form-panel selling-configuration-panel">
+          <div className="section-heading">
+            <div><h2>Configure finished good for selling</h2><p className="catalog-section-copy">Only selling SKU and price are editable in this workflow.</p></div>
+          </div>
           <form className="form-grid" onSubmit={saveSellingDetails}>
             <Field label="SKU" required>
               <input value={form.sku} onChange={(event) => setForm({ ...form, sku: event.target.value })} required />
@@ -100,24 +102,24 @@ export default function SellingProducts() {
               <button type="button" className="button" onClick={() => setEditingId("")} disabled={saving}>Cancel</button>
             </div>
           </form>
-          <p className="form-hint">Only SKU and selling price are changed. The existing product name, classification, unit, stock, and purchase history are preserved.</p>
+          <p className="form-hint">The existing product name, classification, unit, stock, and purchase history are preserved.</p>
         </section>
       )}
-      <section className="panel">
+      <section className="panel catalog-list-panel selling-configured-list">
         <div className="section-heading">
-          <h2>Configured selling products</h2>
+          <div><h2>Configured selling products</h2><p className="catalog-section-copy">Finished goods with selling details set.</p></div>
           <button className="button button-small" onClick={loadProducts} disabled={loading}>Refresh</button>
         </div>
         {loading
           ? <Loading label="Loading finished goods..." />
           : <DataTable columns={columns} rows={configuredProducts} emptyMessage="No finished goods are configured for selling yet." />}
       </section>
-      <section className="panel">
-        <div className="section-heading"><h2>Finished goods available to configure</h2></div>
+      <section className="panel catalog-list-panel selling-candidate-list">
+        <div className="section-heading"><div><h2>Finished goods available to configure</h2><p className="catalog-section-copy">Existing finished goods not yet configured for selling.</p></div></div>
         {loading
           ? <Loading label="Loading finished goods..." />
           : <DataTable columns={columns} rows={candidates} emptyMessage="No unconfigured finished goods." />}
       </section>
-    </>
+    </div>
   );
 }

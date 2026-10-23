@@ -1,3 +1,23 @@
+import { useTheme } from "../theme/ThemeContext.jsx";
+import { CircleAlert, CircleCheck, Info, Moon, Sun, TriangleAlert, X } from "lucide-react";
+import { Alert as AlertPrimitive } from "./ui/alert.jsx";
+import { Button } from "./ui/button.jsx";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table.jsx";
+
+const alertIcons = {
+  error: CircleAlert,
+  success: CircleCheck,
+  warning: TriangleAlert,
+  info: Info,
+};
+
 export function PageTitle({ title, subtitle, children }) {
   return (
     <div className="page-title">
@@ -10,36 +30,92 @@ export function PageTitle({ title, subtitle, children }) {
   );
 }
 
+export function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  const nextTheme = theme === "dark" ? "light" : "dark";
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className="theme-toggle text-secondary-foreground hover:text-foreground"
+      onClick={toggleTheme}
+      aria-label={`Switch to ${nextTheme} theme`}
+      title={`Switch to ${nextTheme} theme`}
+    >
+      {theme === "dark"
+        ? <Sun className="theme-toggle-icon size-4" aria-hidden="true" />
+        : <Moon className="theme-toggle-icon size-4" aria-hidden="true" />}
+      <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+    </Button>
+  );
+}
+
 export function Loading({ label = "Loading..." }) {
   return <div className="loading" role="status">{label}</div>;
 }
 
 export function Alert({ message, kind = "error", onClose }) {
   if (!message) return null;
+  const Icon = alertIcons[kind] || Info;
   return (
-    <div className={`alert alert-${kind}`} role={kind === "error" ? "alert" : "status"}>
-      <span>{message}</span>
-      {onClose && <button className="alert-close" onClick={onClose} aria-label="Dismiss">×</button>}
-    </div>
+    <AlertPrimitive
+      variant={kind === "error" ? "destructive" : kind}
+      className="mb-3 items-start"
+      role={kind === "error" ? "alert" : "status"}
+    >
+      <span className="flex min-w-0 flex-1 items-start gap-2.5">
+        <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+        <span>{message}</span>
+      </span>
+      {onClose && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="-mr-1 -mt-1 size-7 shrink-0 text-current hover:bg-black/5 dark:hover:bg-white/10"
+          onClick={onClose}
+          aria-label="Dismiss"
+        >
+          <X aria-hidden="true" />
+        </Button>
+      )}
+    </AlertPrimitive>
   );
 }
 
 export function DataTable({ columns, rows, emptyMessage = "No records found.", rowKey = "id" }) {
   return (
     <div className="table-wrap">
-      <table>
-        <thead><tr>{columns.map((column) => <th key={column.key}>{column.label}</th>)}</tr></thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {columns.map((column) => (
+              <TableHead
+                key={column.key}
+                className={column.align === "right" ? "text-right tabular-nums whitespace-nowrap" : undefined}
+              >
+                {column.label}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.map((row, index) => (
-            <tr key={row[rowKey] || index}>
+            <TableRow key={row[rowKey] || index}>
               {columns.map((column) => (
-                <td key={column.key}>{column.render ? column.render(row) : (row[column.key] ?? "—")}</td>
+                <TableCell
+                  key={column.key}
+                  className={column.align === "right" ? "text-right tabular-nums whitespace-nowrap" : undefined}
+                >
+                  {column.render ? column.render(row) : (row[column.key] ?? "—")}
+                </TableCell>
               ))}
-            </tr>
+            </TableRow>
           ))}
-          {rows.length === 0 && <tr><td className="empty-cell" colSpan={columns.length}>{emptyMessage}</td></tr>}
-        </tbody>
-      </table>
+          {rows.length === 0 && <TableRow><TableCell className="empty-cell py-10 text-center text-muted-foreground" colSpan={columns.length}>{emptyMessage}</TableCell></TableRow>}
+        </TableBody>
+      </Table>
     </div>
   );
 }
