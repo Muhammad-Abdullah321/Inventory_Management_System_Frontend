@@ -741,6 +741,7 @@ legend { color: var(--text); }
 
 /* Shared demo polish */
 .app-shell { --sidebar-width: 264px; }
+.app-shell.sidebar-collapsed { --sidebar-width: 76px; }
 .sidebar {
   padding: 24px 15px 18px;
   background:
