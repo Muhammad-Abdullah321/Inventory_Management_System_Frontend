@@ -2,30 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { Alert, DataTable, Field, formatDate, formatMoney, Loading, PageTitle } from "../components/Common.jsx";
+import { filterProductsByClassification } from "../utils/inventoryProducts.js";
+import { latestCompatiblePurchaseCost } from "../utils/purchaseCosts.js";
 import { isAtLeastQuantity } from "../utils/quantity.js";
-
-function latestCompatibleCosts(purchases) {
-  const costs = new Map();
-  for (const purchase of purchases) {
-    for (const item of purchase.items || []) {
-      if (
-        !item.unit ||
-        !item.product?.unit ||
-        item.unit !== item.product.unit ||
-        Number(item.unitCost) <= 0
-      ) continue;
-      if (!costs.has(item.productId)) {
-        costs.set(item.productId, {
-          unitCost: item.unitCost,
-          unit: item.unit,
-          purchaseDate: purchase.purchaseDate,
-          vendorName: purchase.vendor?.name || "—",
-        });
-      }
-    }
-  }
-  return costs;
-}
 
 export default function RawMaterialInventory() {
   const { isOwner } = useAuth();
@@ -54,11 +33,10 @@ export default function RawMaterialInventory() {
       const products = productResponse.data.data.filter((product) =>
         ["RAW_MATERIAL", "FINISHED_GOOD"].includes(product.classification)
       );
-      const costs = latestCompatibleCosts(purchaseResponse.data.data);
       const rows = products.map((product) => ({
         ...product,
         buyingQuantity: product.stock?.find((entry) => entry.bucket === "BUYING")?.quantity ?? 0,
-        latestRecordedCost: costs.get(product.id) ?? null,
+        purchaseCost: latestCompatiblePurchaseCost(product, purchaseResponse.data.data),
       }));
       setMaterials(rows);
       setProductId((current) => rows.some((product) => product.id === current)
@@ -79,7 +57,8 @@ export default function RawMaterialInventory() {
 
   const selectedProduct = materials.find((product) => product.id === productId);
   const selectedStock = selectedProduct?.stock?.find((entry) => entry.bucket === "BUYING")?.quantity ?? 0;
-  const finishedGoods = materials.filter((product) => product.classification === "FINISHED_GOOD");
+  const rawMaterials = filterProductsByClassification(materials, "RAW_MATERIAL");
+  const finishedGoods = filterProductsByClassification(materials, "FINISHED_GOOD");
   const selectedFinishedGood = finishedGoods.find((product) => product.id === finishedGoodId);
   const transferableQuantity = selectedFinishedGood?.stock?.find((entry) => entry.bucket === "BUYING")?.quantity ?? 0;
 
@@ -179,25 +158,25 @@ export default function RawMaterialInventory() {
     { key: "unit", label: "Unit", render: (product) => product.unit || "Not set" },
     { key: "buyingQuantity", label: "Buying inventory quantity", align: "right" },
     {
-      key: "latestRecordedCost",
+      key: "purchaseCost",
       label: "Latest known purchase cost",
       align: "right",
-      render: (product) => product.latestRecordedCost
-        ? `${formatMoney(product.latestRecordedCost.unitCost)} / ${product.latestRecordedCost.unit}`
+      render: (product) => product.purchaseCost.cost
+        ? `${formatMoney(product.purchaseCost.cost.unitCost)} / ${product.purchaseCost.cost.unit}`
         : "Unavailable",
     },
     {
       key: "costSource",
       label: "Cost source",
-      render: (product) => product.latestRecordedCost
-        ? `${product.latestRecordedCost.vendorName}, ${formatDate(product.latestRecordedCost.purchaseDate)}`
-        : "No compatible unit snapshot",
+      render: (product) => product.purchaseCost.cost
+        ? `Purchase · ${product.purchaseCost.cost.vendorName}, ${formatDate(product.purchaseCost.cost.purchaseDate)}`
+        : product.purchaseCost.unavailableReason,
     },
   ];
 
   return (
     <div className="inventory-page buying-inventory-page">
-      <PageTitle title="Buying inventory" subtitle="Purchased raw materials and ready-made finished goods, with recorded purchase costs" />
+      <PageTitle title="Raw material inventory" subtitle="Raw material BUYING stock and compatible recorded purchase costs" />
       <Alert message={error} />
       <Alert kind="success" message={success} />
       {isOwner && (
@@ -299,9 +278,9 @@ export default function RawMaterialInventory() {
         </div>
         {loading
           ? <Loading label="Loading buying stock and purchase snapshots..." />
-          : <DataTable columns={columns} rows={materials} emptyMessage="No classified buying products." />}
-        {!loading && materials.length > 0 && (
-          <p className="form-hint">Known cost is the latest purchase-line unit cost with a unit matching the product’s current unit. Historical lines without a compatible unit are not used. Quantities shown are buying stock only.</p>
+          : <DataTable columns={columns} rows={rawMaterials} emptyMessage="No raw materials found." />}
+        {!loading && rawMaterials.length > 0 && (
+          <p className="form-hint">Purchase cost uses the latest valid purchase line whose recorded unit matches the product’s current unit. Historical lines without a compatible unit are not used. Quantities shown are BUYING stock only.</p>
         )}
       </section>
     </div>
