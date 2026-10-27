@@ -52,7 +52,7 @@ export function TableHead({ className, ...props }) {
   return (
     <th
       className={cn(
-        "h-11 whitespace-nowrap border-b border-border bg-muted/70 px-3 py-3 text-left text-[11px] font-semibold tracking-[.07em] text-secondary-foreground uppercase align-middle",
+        "h-12 whitespace-nowrap border-b border-border bg-muted/70 px-4 py-3 text-left text-xs font-semibold tracking-[.07em] text-secondary-foreground uppercase align-middle",
         className,
       )}
       {...props}
@@ -64,7 +64,7 @@ export function TableCell({ className, ...props }) {
   return (
     <td
       className={cn(
-        "border-b border-border px-3 py-3 text-[13px] text-foreground align-middle",
+        "border-b border-border px-4 py-3.5 text-sm text-foreground align-middle",
         className,
       )}
       {...props}
