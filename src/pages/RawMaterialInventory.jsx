@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { Alert, DataTable, Field, formatDate, formatMoney, Loading, PageTitle } from "../components/Common.jsx";
+import { Button } from "../components/ui/button.jsx";
 import { filterProductsByClassification } from "../utils/inventoryProducts.js";
 import { latestCompatiblePurchaseCost } from "../utils/purchaseCosts.js";
 import { isAtLeastQuantity } from "../utils/quantity.js";
@@ -198,7 +199,7 @@ export default function RawMaterialInventory() {
               <input value={reason} onChange={(event) => setReason(event.target.value)} required />
             </Field>
             <div className="form-actions">
-              <button className="button button-primary" disabled={saving || !productId}>{saving ? "Submitting..." : "Adjust stock"}</button>
+              <Button type="submit" disabled={saving || !productId}>{saving ? "Submitting..." : "Adjust stock"}</Button>
               <span className="form-hint">Current buying quantity: {selectedStock}</span>
             </div>
           </form>
@@ -264,7 +265,7 @@ export default function RawMaterialInventory() {
               </>
             )}
             <div className="form-actions">
-              <button className="button button-primary" disabled={saving || !finishedGoodId}>{saving ? "Submitting..." : "Transfer to selling warehouse"}</button>
+              <Button type="submit" disabled={saving || !finishedGoodId}>{saving ? "Submitting..." : "Transfer to selling warehouse"}</Button>
               <span className="form-hint">Source: buying stock ({transferableQuantity} available). Destination: warehouse. The transfer preserves total tracked quantity.</span>
             </div>
             {!finishedGoods.length && <p className="form-hint full-width">Create a finished-good buying product before transferring stock.</p>}
@@ -274,7 +275,7 @@ export default function RawMaterialInventory() {
       <section className="panel inventory-stock-panel">
         <div className="section-heading">
           <h2>Buying stock</h2>
-          <button className="button button-small" onClick={loadInventory} disabled={loading}>Refresh</button>
+          <Button type="button" variant="outline" size="sm" onClick={loadInventory} disabled={loading}>Refresh</Button>
         </div>
         {loading
           ? <Loading label="Loading buying stock and purchase snapshots..." />
