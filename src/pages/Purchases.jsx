@@ -134,9 +134,12 @@ export default function Purchases() {
     { key: "outstandingBalance", label: "Outstanding", align: "right", render: (row) => formatMoney(row.outstandingBalance) },
     { key: "actions", label: "Actions", render: (row) => <button className="button button-small" onClick={() => viewPurchase(row)}>Details / payment</button> },
   ];
-  const purchasableProducts = products.filter((product) =>
-    ["RAW_MATERIAL", "FINISHED_GOOD"].includes(product.classification)
-  );
+ const purchasableProducts = products.filter(
+  (product) =>
+    product.classification === "RAW_MATERIAL" ||
+    (product.classification === "FINISHED_GOOD" &&
+      product.isSellingConfigured === false)
+);
 
   return (
     <div className="purchases-page">

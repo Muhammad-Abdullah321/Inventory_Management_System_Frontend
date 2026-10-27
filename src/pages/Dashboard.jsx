@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Activity,
   Boxes,
@@ -77,6 +78,7 @@ export default function Dashboard() {
       group: "Inventory",
       icon: Boxes,
       tone: "buying",
+      to: "/raw-inventory",
     },
     {
       label: "Warehouse stock",
@@ -85,6 +87,7 @@ export default function Dashboard() {
       group: "Inventory",
       icon: PackageOpen,
       tone: "warehouse",
+      to: "/inventory",
     },
     {
       label: "Shopify-listed stock",
@@ -93,6 +96,7 @@ export default function Dashboard() {
       group: "Inventory",
       icon: PackageCheck,
       tone: "shopify",
+      to: "/inventory",
     },
     {
       label: "Purchases in period",
@@ -152,19 +156,25 @@ export default function Dashboard() {
       {data && !loading && (
         <>
           <section className="dashboard-stats" aria-label="Inventory and purchasing summary">
-            {summaryCards.map(({ label, value, detail, group, icon: Icon, tone }) => (
-              <article className={`dashboard-stat dashboard-stat-${tone}`} key={label}>
-                <div className="dashboard-stat-top">
-                  <span className="dashboard-stat-label">{label}</span>
-                  <span className="dashboard-stat-icon"><Icon aria-hidden="true" /></span>
-                </div>
-                <strong>{value}</strong>
-                <div className="dashboard-stat-bottom">
-                  <small>{detail}</small>
-                  <span>{group}</span>
-                </div>
-              </article>
-            ))}
+            {summaryCards.map(({ label, value, detail, group, icon: Icon, tone, to }) => {
+              const card = (
+                <>
+                  <div className="dashboard-stat-top">
+                    <span className="dashboard-stat-label">{label}</span>
+                    <span className="dashboard-stat-icon"><Icon aria-hidden="true" /></span>
+                  </div>
+                  <strong>{value}</strong>
+                  <div className="dashboard-stat-bottom">
+                    <small>{detail}</small>
+                    <span>{group}</span>
+                  </div>
+                </>
+              );
+
+              return to
+                ? <Link className={`dashboard-stat dashboard-stat-${tone}`} key={label} to={to}>{card}</Link>
+                : <article className={`dashboard-stat dashboard-stat-${tone}`} key={label}>{card}</article>;
+            })}
           </section>
           <section className="panel dashboard-panel dashboard-recent">
             <div className="section-heading">

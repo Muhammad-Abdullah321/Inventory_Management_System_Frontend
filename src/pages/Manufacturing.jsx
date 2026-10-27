@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { Alert, DataTable, Field, formatMoney, Loading, PageTitle } from "../components/Common.jsx";
 import useUnits from "../hooks/useUnits.js";
+import { getAvailableRawMaterials } from "../utils/manufacturing.js";
 import { isAtLeastQuantity } from "../utils/quantity.js";
 
 const QUANTITY_SCALE = 1_000_000n;
@@ -88,9 +89,7 @@ export default function Manufacturing() {
 
   useEffect(() => { loadInputs(); }, [loadInputs]);
 
-  const rawMaterials = products.filter((product) =>
-    product.classification === "RAW_MATERIAL" && product.unit
-  );
+  const rawMaterials = getAvailableRawMaterials(products);
   const productById = useMemo(() => new Map(products.map((product) => [product.id, product])), [products]);
 
   function updateMaterial(index, key, value) {
