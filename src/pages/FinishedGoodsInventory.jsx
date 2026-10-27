@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { Alert, DataTable, formatDate, formatMoney, Loading, PageTitle } from "../components/Common.jsx";
+import { Button } from "../components/ui/button.jsx";
 import { filterProductsByClassification } from "../utils/inventoryProducts.js";
 import { latestCompatiblePurchaseCost } from "../utils/purchaseCosts.js";
 
@@ -57,6 +58,7 @@ export default function FinishedGoodsInventory() {
     {
       key: "purchaseCost",
       label: "Latest compatible purchase cost / unit",
+      align: "right",
       render: (product) => product.purchaseCost.cost
         ? `${formatMoney(product.purchaseCost.cost.unitCost)} / ${product.purchaseCost.cost.unit}`
         : "Unavailable",
@@ -71,6 +73,7 @@ export default function FinishedGoodsInventory() {
     {
       key: "manufacturingCost",
       label: "Manufacturing materials cost / unit",
+      align: "right",
       render: (product) => product.manufacturingCost
         ? `${formatMoney(product.manufacturingCost.perUnitMaterialCost)} / ${product.manufacturingCost.outputUnit}${product.manufacturingCost.perUnitMaterialCostRounded ? " (rounded)" : ""}`
         : "Unavailable",
@@ -94,7 +97,7 @@ export default function FinishedGoodsInventory() {
       <section className="panel inventory-stock-panel">
         <div className="section-heading">
           <h2>Finished goods stock and costs</h2>
-          <button className="button button-small" onClick={loadInventory} disabled={loading}>Refresh</button>
+          <Button type="button" variant="outline" size="sm" onClick={loadInventory} disabled={loading}>Refresh</Button>
         </div>
         {loading
           ? <Loading label="Loading finished goods inventory..." />

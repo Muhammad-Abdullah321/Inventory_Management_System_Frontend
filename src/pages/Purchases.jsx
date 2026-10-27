@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import api, { getErrorMessage } from "../api/client.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { Alert, DataTable, Field, formatDate, formatMoney, Loading, PageTitle } from "../components/Common.jsx";
+import { Button } from "../components/ui/button.jsx";
 
 const emptyLine = { productId: "", quantity: "1", totalPrice: "" };
 
@@ -132,7 +133,7 @@ export default function Purchases() {
     { key: "totalCost", label: "Total", align: "right", render: (row) => formatMoney(row.totalCost) },
     { key: "amountPaid", label: "Paid", align: "right", render: (row) => formatMoney(row.amountPaid) },
     { key: "outstandingBalance", label: "Outstanding", align: "right", render: (row) => formatMoney(row.outstandingBalance) },
-    { key: "actions", label: "Actions", render: (row) => <button className="button button-small" onClick={() => viewPurchase(row)}>Details / payment</button> },
+    { key: "actions", label: "Actions", render: (row) => <Button type="button" variant="outline" size="sm" onClick={() => viewPurchase(row)}>Details / payment</Button> },
   ];
  const purchasableProducts = products.filter(
   (product) =>
@@ -171,7 +172,7 @@ export default function Purchases() {
               </Field>
               <Field label="Quantity" required><input type="number" min="0.000001" step="0.000001" value={item.quantity} onChange={(event) => updateItem(index, "quantity", event.target.value)} required /></Field>
               <Field label="Total line price" required><input type="number" min="0" step="0.01" value={item.totalPrice} onChange={(event) => updateItem(index, "totalPrice", event.target.value)} required /></Field>
-              <button type="button" className="button button-small remove-line" disabled={items.length === 1} onClick={() => setItems((current) => current.filter((_, lineIndex) => lineIndex !== index))}>Remove</button>
+              <Button type="button" variant="outline" size="sm" className="remove-line" disabled={items.length === 1} onClick={() => setItems((current) => current.filter((_, lineIndex) => lineIndex !== index))}>Remove</Button>
             </div>
           ))}
           {isOwner && <div className="purchase-initial-payment">
@@ -203,14 +204,14 @@ export default function Purchases() {
             </div>
           </div>}
           <div className="form-actions purchase-form-actions">
-            <button type="button" className="button" onClick={() => setItems((current) => [...current, { ...emptyLine }])}>Add item</button>
-            <button className="button button-primary" disabled={saving || vendors.length === 0 || purchasableProducts.length === 0}>{saving ? "Submitting..." : "Record purchase"}</button>
+            <Button type="button" variant="outline" onClick={() => setItems((current) => [...current, { ...emptyLine }])}>Add item</Button>
+            <Button type="submit" disabled={saving || vendors.length === 0 || purchasableProducts.length === 0}>{saving ? "Submitting..." : "Record purchase"}</Button>
           </div>
           {(vendors.length === 0 || purchasableProducts.length === 0) && <p className="form-hint">Add at least one vendor and one classified raw material or finished good before recording a purchase.</p>}
         </form>
       </section>
       {selected && <section className="panel purchase-details-panel">
-        <div className="section-heading"><div><h2>Purchase details</h2><p className="purchase-section-copy">Items, payment history, and current balance returned for this purchase.</p></div><button className="button button-small" onClick={() => setSelected(null)}>Close</button></div>
+        <div className="section-heading"><div><h2>Purchase details</h2><p className="purchase-section-copy">Items, payment history, and current balance returned for this purchase.</p></div><Button type="button" variant="outline" size="sm" onClick={() => setSelected(null)}>Close</Button></div>
         <div className="purchase-summary">
           <div className="purchase-summary-item"><span>Vendor</span><strong>{selected.vendor?.name || "—"}</strong></div>
           <div className="purchase-summary-item"><span>Date</span><strong>{formatDate(selected.purchaseDate)}</strong></div>
@@ -240,11 +241,11 @@ export default function Purchases() {
           <Field label="Amount" required><input type="number" min="0.01" max={selected.outstandingBalance} step="0.01" value={payment.amount} onChange={(event) => setPayment({ ...payment, amount: event.target.value })} required /></Field>
           <Field label="Payment date"><input type="date" value={payment.paymentDate} onChange={(event) => setPayment({ ...payment, paymentDate: event.target.value })} /></Field>
           <Field label="Reference"><input value={payment.reference} onChange={(event) => setPayment({ ...payment, reference: event.target.value })} /></Field>
-          <div className="form-actions"><button className="button button-primary" disabled={saving}>{saving ? "Submitting..." : "Record payment"}</button></div>
+          <div className="form-actions"><Button type="submit" disabled={saving}>{saving ? "Submitting..." : "Record payment"}</Button></div>
         </form>}
       </section>}
       <section className="panel purchase-history-panel">
-        <div className="section-heading"><div><h2>Purchase history</h2><p className="purchase-section-copy">Recent purchase receipts and their payment balances.</p></div><button className="button button-small" onClick={loadPurchases}>Refresh</button></div>
+        <div className="section-heading"><div><h2>Purchase history</h2><p className="purchase-section-copy">Recent purchase receipts and their payment balances.</p></div><Button type="button" variant="outline" size="sm" onClick={loadPurchases}>Refresh</Button></div>
         {loading ? <Loading label="Loading purchases..." /> : <DataTable columns={purchaseColumns} rows={purchases} emptyMessage="No purchases recorded yet." />}
       </section>
     </div>
