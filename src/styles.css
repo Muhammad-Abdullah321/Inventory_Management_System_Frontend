@@ -730,15 +730,14 @@ legend { color: var(--text); }
 
 @media (max-width: 900px) {
   .purchase-details-panel .purchase-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .purchase-line-item { grid-template-columns: minmax(160px, 2fr) minmax(100px, 1fr) minmax(120px, 1fr) auto; }
+  .purchase-line-item { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .purchase-line-item .field:first-child { grid-column: 1 / -1; }
+  .purchase-line-item .remove-line { justify-self: start; }
 }
 @media (max-width: 600px) {
   .catalog-page .panel, .vendor-page .panel, .purchases-page .panel, .billing-page .panel { padding: 15px; }
   .catalog-page .section-heading, .vendor-page .section-heading, .purchases-page .section-heading, .billing-page .section-heading { flex-wrap: wrap; }
   .purchase-details-panel .purchase-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .purchase-line-item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .purchase-line-item .field:first-child { grid-column: 1 / -1; }
-  .purchase-line-item .remove-line { justify-self: start; }
   .purchase-form-actions { align-items: stretch; }
   .purchase-form-actions > button { flex: 1 1 150px; }
   .billing-section .billing-status-badge { margin-left: auto; }
